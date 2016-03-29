@@ -27,7 +27,7 @@ c(lower bound param 1, upper bound param 1, lower bound param 2, upper boung
 param 2 ...)}
 
 \item{r2}{Whether or not you want the quasi rsquared value to be returned.
-This defaults to no, (so not specifying the argument or r2 = 'N results in
+This defaults to no, (so not specifying the argument or r2 = 'N' results in
 no r2 values being returned), to include the r2 values use r2 = 'Y'}
 
 \item{supp.errors}{If supp.errors = 'Y' then no error messages will be shown
@@ -75,7 +75,7 @@ nlsLoop(PI_data,
          r2 = 'Y',
          supp.errors = 'Y',
          param_bds = c(0,20000, 0,1000, 0, 500))
-                   
+
 
 }
 \author{
