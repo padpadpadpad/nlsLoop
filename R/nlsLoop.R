@@ -71,22 +71,27 @@
 #'
 #'
 #' @export nlsLoop
-nlsLoop <- function(data, model, tries, id_col, param_bds, r2 = 'N', supp.errors = 'N', AICc = 'Y', ...){
+
+
+nlsLoop <-
+  # arguments needed for nlsLoop ####
+  function(model, data, tries, id_col, param_bds, r2 = 'N', supp.errors = 'N', AICc = 'Y', FUN = 'Y', control,...){
+
+    # checking whether MuMIn is installed
     if (!requireNamespace("MuMIn", quietly = TRUE)){
       stop("The MuMIn package is needed for calculation of AICc. Please install. Can be bypassed by using classic AIC using AICc = 'N'",
            call. = FALSE)
     }
 
-
+  # create model ####
   formula <- as.formula(model)
 
-  # set up dataframe for parameter bounds
-  # set up dataframe for parameter bounds
-  params_bds1 <- all.vars(formula[[3]])
-  params_bds <- params_bds1[! params_bds1 %in% colnames(data)]
-  params <- unique(params_bds)
-  params_bds <- data.frame(param = params_bds, stringsAsFactors = FALSE)
+  # define parameters to estimate and independent variable ####
+  params_ind <- all.vars(formula[[3]])[all.vars(formula[[3]]) %in% colnames(data)]
+  params_est <- all.vars(formula[[3]])[! all.vars(formula[[3]]) %in% colnames(data)]
 
+  # set up parameter boundaries ####
+  params_bds <- data.frame(param = params_est, stringsAsFactors = FALSE)
   params_bds$low.bds <- NA
   params_bds$high.bds <- NA
 
@@ -114,29 +119,31 @@ nlsLoop <- function(data, model, tries, id_col, param_bds, r2 = 'N', supp.errors
   }
 
   # nlsLM controls - this can stay the same, potential to be overridden
-  cont.nlsLM <-minpack.lm::nls.lm.control(maxiter = 1000, ftol = .Machine$double.eps, ptol = .Machine$double.eps)
+  if(missing(control)) {
+    control <- minpack.lm::nls.lm.control(maxiter = 1000, ftol = .Machine$double.eps, ptol = .Machine$double.eps)
+  }
+
+
+  # set up start values ####
+  make_strt_values <- function(x, tries){
+    strt_values <- data.frame(param = rep(x, times = tries),
+                              value = runif(tries, min = params_bds$low.bds[params_bds$param == x], max = params_bds$high.bds[params_bds$param == x]))
+    return(strt_values)
+  }
+
+  strt <- plyr::ldply(as.list(params_est), make_strt_values, tries)
 
   # create a unique id vector
   id <- unique(data[,id_col])
 
-  # create a dataframe for to output your results of the model into
+  # create a dataframe to output model results into ####
   res <- data.frame(id_col = id)
   res[,2:(nrow(params_bds) + 1)] <- 0
   colnames(res) <- c(id_col, params_bds$param)
   res$AIC <- 0
   res$quasi.r2 <- 0
 
-
-  strt <- NULL
-
-  for(i in 1:length(params)){
-    strt_values <- data.frame(param = rep(params[i], times = tries),
-                              value = runif(tries, min = params_bds$low.bds[params_bds$param == params[i]], max = params_bds$high.bds[params_bds$param == params[i]]))
-    strt <- rbind(strt, strt_values)
-
-  }
-
-  # fit nls model using LM optimisation and using shotgun approach to get starting values
+  # fit nls model using LM optimisation and using shotgun approach to get starting values ####
   for (i in 1:length(id)){
     cat('\n', i, 'of', length(id), ':', id[i], '\n')
     fit <- NULL
@@ -146,20 +153,20 @@ nlsLoop <- function(data, model, tries, id_col, param_bds, r2 = 'N', supp.errors
       if((j/10) %% 1 == 0){cat(j, ' ')}
       # create start list
       start.vals <- list()
-      for(k in 1:length(params)){
-        start.vals[[params[k]]] <- strt[strt$param == params[k],]$value[j]
+      for(k in 1:length(params_est)){
+        start.vals[[params_est[k]]] <- strt[strt$param == params_est[k],]$value[j]
       }
       # try and fit the model for every set of searching parameters
       if(supp.errors == 'Y'){
         try(fit <- minpack.lm::nlsLM(formula,
                        start=start.vals,
-                       control = cont.nlsLM,
+                       control = control,
                        data=data.fit, ...),
           silent = TRUE)}
       if(supp.errors != 'Y'){
           try(fit <- minpack.lm::nlsLM(formula,
                        start=start.vals,
-                       control = cont.nlsLM,
+                       control = control,
                        data=data.fit, ...))}
 
       # if it is the first fit of the model, output the results of the model in the dataframe
@@ -169,9 +176,9 @@ nlsLoop <- function(data, model, tries, id_col, param_bds, r2 = 'N', supp.errors
         if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > AIC(fit)){
 
         res[i, 'AIC'] <- AIC(fit)
-        if(r2 == 'Y') {res[i, 'quasi.r2'] <- quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params))}
-        for(k in 1:length(params)){
-          res[i, params[k]] <- as.numeric(coef(fit)[k])
+        if(r2 == 'Y') {res[i, 'quasi.r2'] <- quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        for(k in 1:length(params_est)){
+          res[i, params_est[k]] <- as.numeric(coef(fit)[k])
         }
         }
       }
@@ -180,17 +187,39 @@ nlsLoop <- function(data, model, tries, id_col, param_bds, r2 = 'N', supp.errors
         if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > MuMIn::AICc(fit)){
 
         res[i, 'AIC'] <- MuMIn::AICc(fit)
-        if(r2 == 'Y') {res[i, 'quasi.r2'] <- quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params))}
-        for(k in 1:length(params)){
-          res[i, params[k]] <- as.numeric(coef(fit)[k])
+        if(r2 == 'Y') {res[i, 'quasi.r2'] <- quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        for(k in 1:length(params_est)){
+          res[i, params_est[k]] <- as.numeric(coef(fit)[k])
         }
       }
     }
   }
   }
+
+  # warnings for res ####
   if(r2 == 'N') {res <- res[,-grep('quasi.r2', colnames(res))]}
-  if(supp.errors == 'Y'){cat('\nWarning - Errors have been suppressed from nlsLM().\n')}
-  if(r2 == 'Y'){cat('Warning - R squared values for non-linear models should be used with caution. See references in ?quasi.r2 for details.\n')}
+  if(supp.errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
+  if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi.r2 for details.', call. = F)}
+
+  predict.nlsLoop <- function(x, params_ind = params_ind, FUN = 'Y', formula = formula, params_est = params_est, id_col = id_col){
+
+    if(FUN == 'Y'){
+      x2 <- data[,names(data) %in% params_est]
+      func.call <- as.character(formula[[3]])[1]
+      param_x <- names(formals(func.call))[! names(formals(func.call)) %in% params_est]
+      y <- as.character(formula[[2]])
+
+      predict_id <- data.frame(expand.grid(param_x = seq(min(x[,params_ind]), max(x[,params_ind]), length.out = 100), id_col = x[,id_col]))
+      colnames(predict_id) <- c(param_x, id_col)
+
+      predict_id[, y] <- do.call(func.call, c(x2, ))
+
+    }
+
+    colnames(predict_id)[colnames(predictions_id) == params_ind] <- params_ind
+  }
+
+  predictions <- plyr::ldply(split(res2, id), predict.nlsLoop)
 
   return(res)
 
