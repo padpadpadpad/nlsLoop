@@ -42,6 +42,7 @@
 #' 'Y'. Override this using AICc == 'N'. AICc should be used instead of AIC
 #' when sample size is small in comparison to the number of estimated
 #' parameters (Burnham & Anderson 2002 recommend its use when n / K < 40).
+#' @param func Whether or not your formula is wrapped in a complete function or not (defaults to yes)
 #' @param \dots Extra arguments to pass to nlsLM if necessary.
 #' @return Returns a dataframe with the best parameter values for each curve.
 #' @note Useful additional arguments for nlsLM include: na.action = na.omit,
@@ -67,6 +68,7 @@
 #'          id_col = 'temp',
 #'          r2 = 'Y',
 #'          supp.errors = 'Y',
+#'          func = 'Y',
 #'          param_bds = c(0,20000, 0,1000, 0, 500))
 #'
 #'
@@ -75,7 +77,7 @@
 
 nlsLoop <-
   # arguments needed for nlsLoop ####
-  function(model, data, tries, id_col, param_bds, r2 = 'N', supp.errors = 'N', AICc = 'Y', FUN = 'Y', control,...){
+  function(model, data, tries, id_col, param_bds, r2 = 'N', supp.errors = 'N', AICc = 'Y', func = 'Y', control,...){
 
     # checking whether MuMIn is installed
     if (!requireNamespace("MuMIn", quietly = TRUE)){
@@ -201,26 +203,47 @@ nlsLoop <-
   if(supp.errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
   if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi.r2 for details.', call. = F)}
 
-  predict.nlsLoop <- function(x, params_ind = params_ind, FUN = 'Y', formula = formula, params_est = params_est, id_col = id_col){
+  # creating a predict dataframe ####
+  predict.nlsLoop <- function(x, data. = data, params_ind. = params_ind, func. = func, formula. = formula, params_est. = params_est, id_col. = id_col){
 
-    if(FUN == 'Y'){
-      x2 <- data[,names(data) %in% params_est]
-      func.call <- as.character(formula[[3]])[1]
-      param_x <- names(formals(func.call))[! names(formals(func.call)) %in% params_est]
-      y <- as.character(formula[[2]])
+    if(func. == 'Y'){
+      # subset parameters to just have parameters in function in
+      # x.param <- m[[1]]
+      x.param <- x[,names(x) %in% params_est.]
 
-      predict_id <- data.frame(expand.grid(param_x = seq(min(x[,params_ind]), max(x[,params_ind]), length.out = 100), id_col = x[,id_col]))
-      colnames(predict_id) <- c(param_x, id_col)
+      # subset data to just be the x variable
+      dat <- data.[data.[,id_col.] == x[,id_col.],]
+      x2 <- dat[,names(dat) %in% params_ind., drop = F]
 
-      predict_id[, y] <- do.call(func.call, c(x2, ))
+      # identify function call
+      func.call <- as.character(formula.[[3]])[1]
+
+      # identify name of param_x
+      param_x <- names(formals(func.call))[! names(formals(func.call)) %in% params_est.]
+
+      # identify y variable name
+      y <- as.character(formula.[[2]])
+
+      # create predictions data frame
+      predict_id <- data.frame(expand.grid(param_x = seq(min(x2), max(x2), length.out = 100), id_col = x[,id_col.]))
+      colnames(predict_id) <- c(param_x, id_col.)
+
+      predict_id[, y] <- do.call(func.call, c(x.param, predict_id[,param_x, drop = F]))
 
     }
 
-    colnames(predict_id)[colnames(predictions_id) == params_ind] <- params_ind
+    colnames(predict_id)[colnames(predict_id) == param_x] <- params_ind.
+
+    return(predict_id)
+
   }
 
-  predictions <- plyr::ldply(split(res2, id), predict.nlsLoop)
+  preds <- plyr::ldply(split(res, id), predict.nlsLoop)
+  preds <- subset(preds, select = - c(.id))
 
-  return(res)
+  ### setting up a list return object
+  val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula.[[2]])), params = res, predictions = preds)
+
+  return(val)
 
 }
