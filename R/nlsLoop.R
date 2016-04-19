@@ -242,7 +242,7 @@ nlsLoop <-
   preds <- subset(preds, select = - c(.id))
 
   ### setting up a list return object
-  val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula.[[2]])), params = res, predictions = preds)
+  val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res, predictions = preds)
   class(val) <- 'nlsLoop'
   return(val)
 
