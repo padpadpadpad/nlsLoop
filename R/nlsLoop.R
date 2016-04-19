@@ -61,8 +61,8 @@
 #'
 #' data(PI_data)
 #'
-#' res <- nlsLoop(PI_data,
-#'          GPP ~ Eilers_PI(Pmax, Iopt, a, I = light),
+#' res <- nlsLoop(model = GPP ~ Eilers_PI(Pmax, Iopt, a, I = light),
+#'          data = PI_data,
 #'          tries = 10,
 #'          id_col = 'temp',
 #'          r2 = 'Y',
