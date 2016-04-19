@@ -13,8 +13,7 @@
 #' least squares regression using nlsLM. The best fit is determined using AIC
 #' scores.
 #'
-#' Returns a dataframe of the best estimated parameter fits for each level of
-#' id_col with assOciated AIC score.
+#' Returns a list of objects which includes a parameter dataframe of the best estimated parameter #' fits for each level of id_col with associated AIC score.
 #'
 #' %% ~~ If necessary, more details than the description above ~~
 #'
@@ -28,7 +27,7 @@
 #' fitted. Needs to be in speech marks, ' '.
 #' @param param_bds Upper and lower boundaries for the start parameters. If
 #' missing these default to +/- 1e+09. Need to specified as a vector as :
-#' c(lower bound param 1, upper bound param 1, lower bound param 2, upper boung
+#' c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
 #' param 2 ...)
 #' @param r2 Whether or not you want the quasi rsquared value to be returned.
 #' This defaults to no, (so not specifying the argument or r2 = 'N' results in
@@ -42,9 +41,9 @@
 #' 'Y'. Override this using AICc == 'N'. AICc should be used instead of AIC
 #' when sample size is small in comparison to the number of estimated
 #' parameters (Burnham & Anderson 2002 recommend its use when n / K < 40).
-#' @param func Whether or not your formula is wrapped in a complete function or not (defaults to yes)
+#' @param func Whether or not your formula is wrapped in a complete function or not (defaults to yes, 'Y')
 #' @param \dots Extra arguments to pass to nlsLM if necessary.
-#' @return Returns a dataframe with the best parameter values for each curve.
+#' @return Returns a list of class nlsLoop. Notable elements within the list are $params and $predictions that give the best fit parameters and predictions based on these parameters.
 #' @note Useful additional arguments for nlsLM include: na.action = na.omit,
 #'
 #' lower/upper = c() where these represent upper and lower boundaries for
@@ -62,7 +61,7 @@
 #'
 #' data(PI_data)
 #'
-#' nlsLoop(PI_data,
+#' res <- nlsLoop(PI_data,
 #'          GPP ~ Eilers_PI(Pmax, Iopt, a, I = light),
 #'          tries = 10,
 #'          id_col = 'temp',
@@ -71,6 +70,7 @@
 #'          func = 'Y',
 #'          param_bds = c(0,20000, 0,1000, 0, 500))
 #'
+#' str(res)
 #'
 #' @export nlsLoop
 
@@ -243,7 +243,7 @@ nlsLoop <-
 
   ### setting up a list return object
   val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula.[[2]])), params = res, predictions = preds)
-
+  class(val) <- 'nlsLoop'
   return(val)
 
 }

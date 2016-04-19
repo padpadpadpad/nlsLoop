@@ -5,15 +5,15 @@
 \title{Loops through a non-linear model on many different curves to find the best
 possible fit.}
 \usage{
-nlsLoop(data, model, tries, id_col, param_bds, r2 = "N", supp.errors = "N",
-  AICc = "Y", ...)
+nlsLoop(model, data, tries, id_col, param_bds, r2 = "N", supp.errors = "N",
+  AICc = "Y", func = "Y", control, ...)
 }
 \arguments{
-\item{data}{Data that includes the rates}
-
 \item{model}{The formula that is usually fed into nlsLM. Make sure there is
 a y and an x (the column in your dataframe that is the explanatory variable)
 eg. ln.resp.cor ~ schoolfield.high(ln.c, Ea, Eh, Th, temp=K, Tc = 25)}
+
+\item{data}{Data that includes the rates}
 
 \item{tries}{Number of combinations of different starting parameters that
 are tried on each curve.}
@@ -23,7 +23,7 @@ fitted. Needs to be in speech marks, ' '.}
 
 \item{param_bds}{Upper and lower boundaries for the start parameters. If
 missing these default to +/- 1e+09. Need to specified as a vector as :
-c(lower bound param 1, upper bound param 1, lower bound param 2, upper boung
+c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
 param 2 ...)}
 
 \item{r2}{Whether or not you want the quasi rsquared value to be returned.
@@ -41,10 +41,12 @@ error messages in the nlsLM function are not important.}
 when sample size is small in comparison to the number of estimated
 parameters (Burnham & Anderson 2002 recommend its use when n / K < 40).}
 
+\item{func}{Whether or not your formula is wrapped in a complete function or not (defaults to yes, 'Y')}
+
 \item{\dots}{Extra arguments to pass to nlsLM if necessary.}
 }
 \value{
-Returns a dataframe with the best parameter values for each curve.
+Returns a list of class nlsLoop. Notable elements within the list are $params and $predictions that give the best fit parameters and predictions based on these parameters.
 }
 \description{
 Fits the best possible model to each of a set of curves using non-linear
@@ -52,8 +54,7 @@ least squares regression using nlsLM. The best fit is determined using AIC
 scores.
 }
 \details{
-Returns a dataframe of the best estimated parameter fits for each level of
-id_col with assOciated AIC score.
+Returns a list of objects which includes a parameter dataframe of the best estimated parameter #' fits for each level of id_col with associated AIC score.
 
 %% ~~ If necessary, more details than the description above ~~
 }
@@ -68,14 +69,16 @@ parameter estimates
 
 data(PI_data)
 
-nlsLoop(PI_data,
+res <- nlsLoop(PI_data,
          GPP ~ Eilers_PI(Pmax, Iopt, a, I = light),
          tries = 10,
          id_col = 'temp',
          r2 = 'Y',
          supp.errors = 'Y',
+         func = 'Y',
          param_bds = c(0,20000, 0,1000, 0, 500))
 
+str(res)
 
 }
 \author{

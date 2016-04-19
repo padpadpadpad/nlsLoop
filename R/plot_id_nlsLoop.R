@@ -1,16 +1,17 @@
 # function
 
-#' Creates a graph of one of the levels of id_col with the corresponding predictions fitted
+#' Creates a graph of one of the levels of id_col with raw data and corresponding predictions
 #'
-#'
+#' @param raw_data The data frame containing the data used in the nlsLoop argument
+#' @param param_data The nlsLoop object
+#' @param id The level of id_col from which the plot is desired
 #' @author Daniel Padfield
 #' @return a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
-#' @note variables \code{id_col}, \code{id},\code{x},\code{y}, and \code{predict.y} need to be in \code{''} or \code{""}
 #'
-#' @export plot_curve
+#' @export plot_id_nlsLoop
 
 # plot single curve
-plot_curve <- function(raw_data, param_data, id){
+plot_id_nlsLoop <- function(raw_data, param_data, id){
   # load in package
   library(ggplot2)
   id_col <- as.character(param_data$info$id_col)
