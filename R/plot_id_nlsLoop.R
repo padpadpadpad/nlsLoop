@@ -13,7 +13,7 @@
 # plot single curve
 plot_id_nlsLoop <- function(raw_data, param_data, id){
   # load in package
-  library(ggplot2)
+  suppressPackageStartupMessages(library(ggplot2))
   id_col <- as.character(param_data$info$id_col)
   x <- as.character(param_data$info$params_ind)
   y <- as.character(param_data$info$param_dep)
