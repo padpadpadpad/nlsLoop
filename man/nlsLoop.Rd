@@ -6,7 +6,7 @@
 possible fit.}
 \usage{
 nlsLoop(model, data, tries, id_col, param_bds, r2 = "N", supp.errors = "N",
-  AICc = "Y", func = "Y", control, ...)
+  AICc = "Y", control, ...)
 }
 \arguments{
 \item{model}{The formula that is usually fed into nlsLM. Make sure there is
@@ -24,7 +24,7 @@ fitted. Needs to be in speech marks, ' '.}
 \item{param_bds}{Upper and lower boundaries for the start parameters. If
 missing these default to +/- 1e+09. Need to specified as a vector as :
 c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
-param 2 ...)}
+param 2 etc)}
 
 \item{r2}{Whether or not you want the quasi rsquared value to be returned.
 This defaults to no, (so not specifying the argument or r2 = 'N' results in
@@ -41,7 +41,7 @@ error messages in the nlsLM function are not important.}
 when sample size is small in comparison to the number of estimated
 parameters (Burnham & Anderson 2002 recommend its use when n / K < 40).}
 
-\item{func}{Whether or not your formula is wrapped in a complete function or not (defaults to yes, 'Y')}
+\item{control}{If specific control arguments are desired they can be specified using nls.lm.control here}
 
 \item{\dots}{Extra arguments to pass to nlsLM if necessary.}
 }
@@ -54,7 +54,8 @@ least squares regression using nlsLM. The best fit is determined using AIC
 scores.
 }
 \details{
-Returns a list of objects which includes a parameter dataframe of the best estimated parameter #' fits for each level of id_col with associated AIC score.
+Returns a list of objects which includes a parameter dataframe of the best estimated parameter
+fits for each level of `id_col` with associated AIC score.
 
 %% ~~ If necessary, more details than the description above ~~
 }
@@ -66,31 +67,12 @@ parameter estimates
 }
 \examples{
 
-
-data(PI_data)
-
-res <- nlsLoop(model = GPP ~ Eilers_PI(Pmax, Iopt, a, I = light),
-         data = PI_data,
-         tries = 10,
-         id_col = 'temp',
-         r2 = 'Y',
-         supp.errors = 'Y',
-         func = 'Y',
-         param_bds = c(0,20000, 0,1000, 0, 500))
-
-str(res)
-
 }
 \author{
 Daniel Padfield
-}
-\seealso{
-\code{\link{quasi.r2}} for details on the calculation of r squared
+\code{\link[nlsTools]{quasi.rsq.nls}} for details on the calculation of r squared
 values for non linear models.
-
-\code{\link{nlsLM}} for details on additional arguments to pass to the nlsLM
-function.
-
+\code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
 See AICc in the AICcmodavg package for application of AICc.
 }
 

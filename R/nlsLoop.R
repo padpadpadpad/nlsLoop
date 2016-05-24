@@ -13,7 +13,8 @@
 #' least squares regression using nlsLM. The best fit is determined using AIC
 #' scores.
 #'
-#' Returns a list of objects which includes a parameter dataframe of the best estimated parameter #' fits for each level of id_col with associated AIC score.
+#' Returns a list of objects which includes a parameter dataframe of the best estimated parameter
+#' fits for each level of `id_col` with associated AIC score.
 #'
 #' %% ~~ If necessary, more details than the description above ~~
 #'
@@ -28,7 +29,7 @@
 #' @param param_bds Upper and lower boundaries for the start parameters. If
 #' missing these default to +/- 1e+09. Need to specified as a vector as :
 #' c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
-#' param 2 ...)
+#' param 2 etc)
 #' @param r2 Whether or not you want the quasi rsquared value to be returned.
 #' This defaults to no, (so not specifying the argument or r2 = 'N' results in
 #' no r2 values being returned), to include the r2 values use r2 = 'Y'
@@ -41,7 +42,7 @@
 #' 'Y'. Override this using AICc == 'N'. AICc should be used instead of AIC
 #' when sample size is small in comparison to the number of estimated
 #' parameters (Burnham & Anderson 2002 recommend its use when n / K < 40).
-#' @param func Whether or not your formula is wrapped in a complete function or not (defaults to yes, 'Y')
+#' @param control If specific control arguments are desired they can be specified using nls.lm.control here
 #' @param \dots Extra arguments to pass to nlsLM if necessary.
 #' @return Returns a list of class nlsLoop. Notable elements within the list are $params and $predictions that give the best fit parameters and predictions based on these parameters.
 #' @note Useful additional arguments for nlsLM include: na.action = na.omit,
@@ -49,35 +50,18 @@
 #' lower/upper = c() where these represent upper and lower boundaries for
 #' parameter estimates
 #' @author Daniel Padfield
-#' @seealso \code{\link{quasi.r2}} for details on the calculation of r squared
+#' \code{\link[nlsTools]{quasi.rsq.nls}} for details on the calculation of r squared
 #' values for non linear models.
-#'
-#' \code{\link{nlsLM}} for details on additional arguments to pass to the nlsLM
-#' function.
-#'
+#' \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
 #' See AICc in the AICcmodavg package for application of AICc.
 #' @examples
-#'
-#'
-#' data(PI_data)
-#'
-#' res <- nlsLoop(model = GPP ~ Eilers_PI(Pmax, Iopt, a, I = light),
-#'          data = PI_data,
-#'          tries = 10,
-#'          id_col = 'temp',
-#'          r2 = 'Y',
-#'          supp.errors = 'Y',
-#'          func = 'Y',
-#'          param_bds = c(0,20000, 0,1000, 0, 500))
-#'
-#' str(res)
 #'
 #' @export nlsLoop
 
 
 nlsLoop <-
   # arguments needed for nlsLoop ####
-  function(model, data, tries, id_col, param_bds, r2 = 'N', supp.errors = 'N', AICc = 'Y', func = 'Y', control,...){
+  function(model, data, tries, id_col, param_bds, r2 = 'N', supp.errors = 'N', AICc = 'Y', control,...){
 
     # checking whether MuMIn is installed
     if (!requireNamespace("MuMIn", quietly = TRUE)){
@@ -169,7 +153,7 @@ nlsLoop <-
           try(fit <- minpack.lm::nlsLM(formula,
                        start=start.vals,
                        control = control,
-                       data=data.fit, ...))}
+                       data=data.fit))} #<----- Took out ...
 
       # if it is the first fit of the model, output the results of the model in the dataframe
       # if the AIC score of the next fit model is < the AIC of the fit in the dataframe, replace
@@ -178,7 +162,7 @@ nlsLoop <-
         if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > AIC(fit)){
 
         res[i, 'AIC'] <- AIC(fit)
-        if(r2 == 'Y') {res[i, 'quasi.r2'] <- quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsTools::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
           res[i, params_est[k]] <- as.numeric(coef(fit)[k])
         }
@@ -189,7 +173,7 @@ nlsLoop <-
         if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > MuMIn::AICc(fit)){
 
         res[i, 'AIC'] <- MuMIn::AICc(fit)
-        if(r2 == 'Y') {res[i, 'quasi.r2'] <- quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsTools::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
           res[i, params_est[k]] <- as.numeric(coef(fit)[k])
         }
@@ -204,35 +188,23 @@ nlsLoop <-
   if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi.r2 for details.', call. = F)}
 
   # creating a predict dataframe ####
-  predict.nlsLoop <- function(x, data. = data, params_ind. = params_ind, func. = func, formula. = formula, params_est. = params_est, id_col. = id_col){
+  predict.nlsLoop <- function(x, data. = data, params_ind. = params_ind, formula. = formula, params_est. = params_est, id_col. = id_col){
 
-    if(func. == 'Y'){
-      # subset parameters to just have parameters in function in
-      # x.param <- m[[1]]
-      x.param <- x[,names(x) %in% params_est.]
+    # subset results data frame to contain just estimated parameters
+    est.param.val <- x[,names(x) %in% params_est.]
 
-      # subset data to just be the x variable
-      dat <- data.[data.[,id_col.] == x[,id_col.],]
-      x2 <- dat[,names(dat) %in% params_ind., drop = F]
+    # subset data to just be the x variable
+    dat <- data.[data.[,id_col.] == x[,id_col.],]
+    x2 <- dat[,names(dat) %in% params_ind., drop = F]
 
-      # identify function call
-      func.call <- as.character(formula.[[3]])[1]
+    # identify y variable name
+    y <- as.character(formula.[[2]])
 
-      # identify name of param_x
-      param_x <- names(formals(func.call))[! names(formals(func.call)) %in% params_est.]
+    # create a predictions data frame
+    predict_id <- data.frame(expand.grid(params_ind. = seq(min(x2), max(x2), length.out = 250), id_col = x[,id_col.]))
+    colnames(predict_id) <- c(params_ind., id_col.)
 
-      # identify y variable name
-      y <- as.character(formula.[[2]])
-
-      # create predictions data frame
-      predict_id <- data.frame(expand.grid(param_x = seq(min(x2), max(x2), length.out = 100), id_col = x[,id_col.]))
-      colnames(predict_id) <- c(param_x, id_col.)
-
-      predict_id[, y] <- do.call(func.call, c(x.param, predict_id[,param_x, drop = F]))
-
-    }
-
-    colnames(predict_id)[colnames(predict_id) == param_x] <- params_ind.
+    predict_id[, y] = eval(formula.[[3]], envir = c(est.param.val, predict_id[,params_ind., drop = F]))
 
     return(predict_id)
 
