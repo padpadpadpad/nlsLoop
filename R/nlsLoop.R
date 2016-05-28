@@ -135,6 +135,10 @@ nlsLoop <-
     fit <- NULL
     # subset the dataframe to fit the model for each unique curve by id
     data.fit <- data[data[,id_col] == id[i],]
+
+    # set count to 0
+    count <- 0
+
     for (j in 1:tries){
       if((j/10) %% 1 == 0){cat(j, ' ')}
       # create start list
@@ -153,14 +157,14 @@ nlsLoop <-
           try(fit <- minpack.lm::nlsLM(formula,
                        start=start.vals,
                        control = control,
-                       data=data.fit))} #<----- Took out ...
+                       data=data.fit, ...))} #<----- Took out ...
 
       # if it is the first fit of the model, output the results of the model in the dataframe
       # if the AIC score of the next fit model is < the AIC of the fit in the dataframe, replace
       # the output to ensure the best model is selected
       if(AICc == 'N'){
-        if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > AIC(fit)){
 
+        if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > AIC(fit)){
         res[i, 'AIC'] <- AIC(fit)
         if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsTools::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
@@ -170,6 +174,7 @@ nlsLoop <-
       }
 
       else{
+
         if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > MuMIn::AICc(fit)){
 
         res[i, 'AIC'] <- MuMIn::AICc(fit)
@@ -180,8 +185,7 @@ nlsLoop <-
       }
     }
   }
-  }
-
+}
   # warnings for res ####
   if(r2 == 'N') {res <- res[,-grep('quasi.r2', colnames(res))]}
   if(supp.errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
@@ -201,7 +205,7 @@ nlsLoop <-
     y <- as.character(formula.[[2]])
 
     # create a predictions data frame
-    predict_id <- data.frame(expand.grid(params_ind. = seq(min(x2), max(x2), length.out = 250), id_col = x[,id_col.]))
+    predict_id <- data.frame(expand.grid(params_ind. = seq(min(x2, na.rm = T), max(x2, na.rm = T), length.out = 250), id_col = x[,id_col.]))
     colnames(predict_id) <- c(params_ind., id_col.)
 
     predict_id[, y] = eval(formula.[[3]], envir = c(est.param.val, predict_id[,params_ind., drop = F]))
