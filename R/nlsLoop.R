@@ -163,6 +163,13 @@ nlsLoop <-
       # if the AIC score of the next fit model is < the AIC of the fit in the dataframe, replace
       # the output to ensure the best model is selected
       if(AICc == 'N'){
+        if(is.null(fit) == T){
+          count <-  0
+        }
+        else{
+          count <- ifelse(res[i, 'AIC'] <= AIC(fit), count + 1, 0)
+        }
+        if(count == 100) break
 
         if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > AIC(fit)){
         res[i, 'AIC'] <- AIC(fit)
@@ -174,6 +181,14 @@ nlsLoop <-
       }
 
       else{
+
+        if(is.null(fit) == T){
+          count <-  0
+        }
+        else{
+          count <- ifelse(res[i, 'AIC'] <= MuMIn::AICc(fit), count + 1, 0)
+        }
+        if(count == 100) break
 
         if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > MuMIn::AICc(fit)){
 
