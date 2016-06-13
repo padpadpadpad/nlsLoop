@@ -14,6 +14,8 @@
 plot_all_nlsLoop <- function(file_name, raw_data, param_data){
   # load in package
   suppressPackageStartupMessages(library(ggplot2))
+  raw_data <- raw_data[,c(x,y, id_col)]
+  raw_data <- raw_dat[complete.cases(raw_dat),]
   id_col <- as.character(param_data$info$id_col)
   x <- as.character(param_data$info$params_ind)
   y <- as.character(param_data$info$param_dep)
