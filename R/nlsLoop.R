@@ -214,7 +214,7 @@ nlsLoop <-
 
     # subset data to just be the x variable
     dat <- data.[data.[,id_col.] == x[,id_col.],]
-
+    dat <- dat[complete.cases(dat),]
     x2 <- dat[,names(dat) %in% params_ind., drop = F]
 
     # identify y variable name
