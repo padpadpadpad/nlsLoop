@@ -120,6 +120,7 @@ nlsLoop <-
   strt <- plyr::ldply(as.list(params_est), make_strt_values, tries)
 
   # create a unique id vector
+  if(is.character(data[,id_col]) == F){data[,id_col] <- as.character(data[,id_col])}
   id <- unique(data[,id_col])
 
   # create a dataframe to output model results into ####
@@ -212,13 +213,13 @@ nlsLoop <-
     # subset results data frame to contain just estimated parameters
     est.param.val <- x[,names(x) %in% params_est.]
 
-    # subset data to just be the x variable
-    dat <- data.[data.[,id_col.] == x[,id_col.],]
-    dat <- dat[complete.cases(dat),]
-    x2 <- dat[,names(dat) %in% params_ind., drop = F]
-
     # identify y variable name
     y <- as.character(formula.[[2]])
+
+    # subset data to just be the x variable
+    dat <- data.[data.[,id_col.] == x[,id_col.],]
+    dat <- dat[! is.na(dat[,y]),]
+    x2 <- dat[,names(dat) %in% params_ind., drop = F]
 
     # create a predictions data frame
     predict_id <- data.frame(expand.grid(params_ind. = seq(min(x2, na.rm = T), max(x2, na.rm = T), length.out = 250), id_col = x[,id_col.]))
