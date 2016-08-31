@@ -25,7 +25,8 @@ plot_id_nlsLoop <- function(raw_data, param_data, id){
     geom_point(aes_string(x = x, y = y), shape = 21, fill = 'white', size = 2.75, raw_dat) +
     ylab(y) +
     xlab(x) +
-    theme_bw(base_family = 'Helvetica', base_size = 14)
+    theme_bw(base_family = 'Helvetica', base_size = 14) +
+    ggtitle(id_col)
   return(plot)
 
 }
