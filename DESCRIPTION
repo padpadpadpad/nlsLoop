@@ -1,4 +1,4 @@
-Package: nlsTools
+Package: nlsLoop
 Title: Tools for shotgunning best fits for non-least squares regression
 Version: 0.0.0.9000
 Authors@R: person("Daniel", "Padfield", email = "dp323@exeter.ac.uk", role = c("aut", "cre"))
