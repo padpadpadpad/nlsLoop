@@ -26,7 +26,7 @@ plot_id_nlsLoop <- function(raw_data, param_data, id){
     ylab(y) +
     xlab(x) +
     theme_bw(base_family = 'Helvetica', base_size = 14) +
-    ggtitle(id_col)
+    ggtitle(id)
   return(plot)
 
 }
