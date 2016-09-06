@@ -11,4 +11,6 @@ RoxygenNote: 5.0.1
 Imports: minpack.lm,
     ggplot2,
     MuMIn,
-    plyr
+    plyr,
+    stats,
+    grDevices

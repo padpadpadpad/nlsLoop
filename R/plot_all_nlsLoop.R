@@ -13,7 +13,6 @@
 
 plot_all_nlsLoop <- function(file_name, raw_data, param_data){
   # load in package
-  suppressPackageStartupMessages(library(ggplot2))
   id_col <- as.character(param_data$info$id_col)
   x <- as.character(param_data$info$params_ind)
   y <- as.character(param_data$info$param_dep)
@@ -24,19 +23,19 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data){
 
   id <- unique(raw_data[,id_col])
 
-  pdf(file_name)
+  grDevices::pdf(file_name)
   for(i in 1:length(id)){
-    plot <- ggplot() +
-      geom_line(aes_string(x = x, y = y), predict_data[predict_data[,id_col] == id[i],], col = 'red', linetype = 2) +
-      geom_point(aes_string(x = x, y = y), shape = 21, fill = 'white', size = 2.75, raw_data[raw_data[,id_col] == id[i],]) +
-      ylab(y) +
-      xlab(x) +
-      theme_bw(base_family = 'Helvetica', base_size = 14) +
-      ggtitle(id[i])
+    plot <- ggplot2::ggplot() +
+      ggplot2::geom_line(ggplot2::aes_string(x = x, y = y), predict_data[predict_data[,id_col] == id[i],], col = 'red', linetype = 2) +
+      ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, fill = 'white', size = 2.75, raw_data[raw_data[,id_col] == id[i],]) +
+      ggplot2::ylab(y) +
+      ggplot2::xlab(x) +
+      ggplot2::theme_bw(base_family = 'Helvetica', base_size = 14) +
+      ggplot2::ggtitle(id[i])
 
     print(plot)
   }
 
-  dev.off()
+  grDevices::dev.off()
 
 }

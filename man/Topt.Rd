@@ -18,23 +18,13 @@ half high temperature suppressed (in K)}
 Defaults to K. 'Y' gives K and 'N' gives degrees celsius}
 }
 \value{
-%% ~Describe the value returned %% If it is a LIST, use %%
+value of optimum temperature
 }
 \description{
 Calculates the optimum temperature from the parameters of the modified
 Sharpe-Schoolfield equation. Used in tandem with schoolfield.high
 }
-\details{
-%% ~~ If necessary, more details than the description above ~~
-}
-\note{
-%% ~~further notes~~
-}
 \examples{
-
-
-## example
-
 Topt(4, 315, 0.6)
 312.6682
 
@@ -43,30 +33,8 @@ Topt(4, 315, 0.6, 'N')
 
 312.6682 - 273.15 = 39.5182
 
-
-###############################################################################
-## The function is currently defined as
-function (Eh, Th, Ea, K = c("Y", "N")) 
-{
-    if (missing(K)) 
-        return(Eh * (1/((Eh/Th) + (8.62e-05 * log(Eh - Ea/Ea)))))
-    if (K == "Y") 
-        return(Eh * (1/((Eh/Th) + (8.62e-05 * log(Eh - Ea/Ea)))))
-    if (K == "N") 
-        return((Eh * (1/((Eh/Th) + (8.62e-05 * log(Eh - Ea/Ea))))) - 
-            273.15)
-  }
-
 }
 \author{
 Daniel Padfield
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
-\keyword{~kwd1}
-\keyword{~kwd2}
 

@@ -70,7 +70,7 @@ nlsLoop <-
     }
 
   # create model ####
-  formula <- as.formula(model)
+  formula <- stats::as.formula(model)
 
   # define parameters to estimate and independent variable ####
   params_ind <- all.vars(formula[[3]])[all.vars(formula[[3]]) %in% colnames(data)]
@@ -113,7 +113,7 @@ nlsLoop <-
   # set up start values ####
   make_strt_values <- function(x, tries){
     strt_values <- data.frame(param = rep(x, times = tries),
-                              value = runif(tries, min = params_bds$low.bds[params_bds$param == x], max = params_bds$high.bds[params_bds$param == x]))
+                              value = stats::runif(tries, min = params_bds$low.bds[params_bds$param == x], max = params_bds$high.bds[params_bds$param == x]))
     return(strt_values)
   }
 
@@ -168,7 +168,7 @@ nlsLoop <-
           count <-  0
         }
         else{
-          count <- ifelse(res[i, 'AIC'] <= AIC(fit), count + 1, 0)
+          count <- ifelse(res[i, 'AIC'] <= stats::AIC(fit), count + 1, 0)
         }
         if(count == 100) break
 
