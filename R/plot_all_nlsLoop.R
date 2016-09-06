@@ -17,7 +17,7 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data){
   x <- as.character(param_data$info$params_ind)
   y <- as.character(param_data$info$param_dep)
   raw_data <- raw_data[,c(x,y, id_col)]
-  raw_data <- raw_data[complete.cases(raw_data),]
+  raw_data <- raw_data[stats::complete.cases(raw_data),]
 
   predict_data <- param_data$predictions
 

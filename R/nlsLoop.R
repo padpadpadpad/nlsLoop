@@ -176,7 +176,7 @@ nlsLoop <-
         res[i, 'AIC'] <- AIC(fit)
         if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsTools::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
-          res[i, params_est[k]] <- as.numeric(coef(fit)[k])
+          res[i, params_est[k]] <- as.numeric(stats::coef(fit)[k])
         }
         }
       }
@@ -196,7 +196,7 @@ nlsLoop <-
         res[i, 'AIC'] <- MuMIn::AICc(fit)
         if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsTools::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
-          res[i, params_est[k]] <- as.numeric(coef(fit)[k])
+          res[i, params_est[k]] <- as.numeric(stats::coef(fit)[k])
         }
       }
     }
