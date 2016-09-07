@@ -216,7 +216,7 @@ nlsLoop <-
   }
 
   preds <- plyr::ldply(split(res, id), predict.nlsLoop)
-  preds <- preds[,c(3,2)]
+  preds <- preds[,c(3,2,4)]
 
   ### setting up a list return object
   val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res, predictions = preds)
