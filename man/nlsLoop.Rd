@@ -46,6 +46,8 @@ parameters (Burnham & Anderson 2002 recommend its use when n / K < 40).}
 \item{\dots}{Extra arguments to pass to nlsLM if necessary.}
 }
 \value{
+returns a list of objects which includes a parameter dataframe of the best estimated parameter fits for each level of `id_col` with associated AIC score.
+
 Returns a list of class nlsLoop. Notable elements within the list are $params and $predictions that give the best fit parameters and predictions based on these parameters.
 }
 \description{
@@ -53,26 +55,16 @@ Fits the best possible model to each of a set of curves using non-linear
 least squares regression using nlsLM. The best fit is determined using AIC
 scores.
 }
-\details{
-Returns a list of objects which includes a parameter dataframe of the best estimated parameter
-fits for each level of `id_col` with associated AIC score.
-
-%% ~~ If necessary, more details than the description above ~~
-}
 \note{
 Useful additional arguments for nlsLM include: na.action = na.omit,
-
 lower/upper = c() where these represent upper and lower boundaries for
 parameter estimates
 }
-\examples{
-
-}
 \author{
 Daniel Padfield
-\code{\link[nlsTools]{quasi.rsq.nls}} for details on the calculation of r squared
+\code{\link[nlsLoop]{quasi.rsq.nls}} for details on the calculation of r squared
 values for non linear models.
 \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
-See AICc in the AICcmodavg package for application of AICc.
+\code{\link[MuMIn]{AICc}} for application of AICc.
 }
 

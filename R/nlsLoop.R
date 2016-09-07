@@ -1,11 +1,3 @@
-#########################################################
-################### nlsLoop
-
-
-
-# function
-
-
 #' Loops through a non-linear model on many different curves to find the best
 #' possible fit.
 #'
@@ -13,11 +5,7 @@
 #' least squares regression using nlsLM. The best fit is determined using AIC
 #' scores.
 #'
-#' Returns a list of objects which includes a parameter dataframe of the best estimated parameter
-#' fits for each level of `id_col` with associated AIC score.
-#'
-#' %% ~~ If necessary, more details than the description above ~~
-#'
+#' @return returns a list of objects which includes a parameter dataframe of the best estimated parameter fits for each level of `id_col` with associated AIC score.
 #' @param data Data that includes the rates
 #' @param model The formula that is usually fed into nlsLM. Make sure there is
 #' a y and an x (the column in your dataframe that is the explanatory variable)
@@ -46,18 +34,14 @@
 #' @param \dots Extra arguments to pass to nlsLM if necessary.
 #' @return Returns a list of class nlsLoop. Notable elements within the list are $params and $predictions that give the best fit parameters and predictions based on these parameters.
 #' @note Useful additional arguments for nlsLM include: na.action = na.omit,
-#'
 #' lower/upper = c() where these represent upper and lower boundaries for
 #' parameter estimates
 #' @author Daniel Padfield
-#' \code{\link[nlsTools]{quasi.rsq.nls}} for details on the calculation of r squared
+#' \code{\link[nlsLoop]{quasi.rsq.nls}} for details on the calculation of r squared
 #' values for non linear models.
 #' \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
-#' See AICc in the AICcmodavg package for application of AICc.
-#' @examples
-#'
-#' @export nlsLoop
-
+#' \code{\link[MuMIn]{AICc}} for application of AICc.
+#' @export
 
 nlsLoop <-
   # arguments needed for nlsLoop ####
@@ -172,9 +156,9 @@ nlsLoop <-
         }
         if(count == 100) break
 
-        if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > AIC(fit)){
-        res[i, 'AIC'] <- AIC(fit)
-        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsTools::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > stats::AIC(fit)){
+        res[i, 'AIC'] <- stats::AIC(fit)
+        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsLoop::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
           res[i, params_est[k]] <- as.numeric(stats::coef(fit)[k])
         }
@@ -194,7 +178,7 @@ nlsLoop <-
         if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > MuMIn::AICc(fit)){
 
         res[i, 'AIC'] <- MuMIn::AICc(fit)
-        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsTools::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsLoop::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
           res[i, params_est[k]] <- as.numeric(stats::coef(fit)[k])
         }

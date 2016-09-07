@@ -23,7 +23,7 @@ models. The formula for calculating this is given in the paper in the
 references (Spiess 2010).
 }
 \details{
-Cautionary notes of whether its useful are provided in the stack overflow
+#' Cautionary notes of whether its useful are provided in the stack overflow
 reference. A personal highlight of which is 'If someone asks for rope to
 hang themselves, its fine to give it to them (while performing due diligence
 by asking "are you sure you want to do this?")'
@@ -39,10 +39,6 @@ RSS is the residual sum of squares given by deviance(mdl)
 TSS is given by how much variance there is in the dependent variable:
 
 (n - 1)*var(y)
-}
-\examples{
-
-
 }
 \author{
 Daniel Padfield

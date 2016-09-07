@@ -20,7 +20,7 @@ plot_id_nlsLoop <- function(raw_data, param_data, id){
   predict_data <- predict_data[predict_data[,id_col] == id,]
   plot <- ggplot2::ggplot() +
     ggplot2::geom_line(ggplot2::aes_string(x = x, y = y), predict_data, col = 'red', linetype = 2) +
-    ggplot2::geom_point(aes_string(x = x, y = y), shape = 21, fill = 'white', size = 2.75, raw_dat) +
+    ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, fill = 'white', size = 2.75, raw_dat) +
     ggplot2::ylab(y) +
     ggplot2::xlab(x) +
     ggplot2::theme_bw(base_family = 'Helvetica', base_size = 14) +

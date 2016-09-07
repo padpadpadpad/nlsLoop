@@ -10,11 +10,11 @@ schoolfield.high(ln.c, Ea, Eh, Th, temp, Tc)
 \arguments{
 \item{ln.c}{The specific rate of metabolism (log scale)}
 
-\item{Ea}{Activation energy}
+\item{Ea}{activation energy (eV)}
 
-\item{Eh}{High temperare De-Activation energy}
+\item{Eh}{high temperature de-activation energy (eV)}
 
-\item{Th}{T at which enzyme is 1/2 active and 1/2 High-T suppressed}
+\item{Th}{temperature at which enzyme is 1/2 active and 1/2 High-T suppressed}
 
 \item{temp}{temperature in K}
 
@@ -27,14 +27,7 @@ performance curve.
 \author{
 Daniel Padfield
 }
-\seealso{
-\code{\link{schoolfield}} for applying the high and low temperature
-inactivation modification of the Sharpe-Schoolfield model.
-
-\code{\link{Topt}} for calculating the optimum temperature of the
-Sharpe-Schoolfield model
-
-\code{\link{SH.Tmin}} and \code{\link{SH.Tmax}} for empirically calculating
-the thermal minima and maxima.
+\references{
+Schoolfield, R. M., Sharpe, P. J. & Magnuson, C. E. Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theor. Biol. 88, 719–731 (1981)
 }
 
