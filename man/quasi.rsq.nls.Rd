@@ -15,7 +15,7 @@ residual sum of squares.}
 \item{param}{the number of parameters of the non-linear model}
 }
 \value{
-%% ~Describe the value returned %% If it is a LIST, use %%
+value of r squared for specific non-linear model object
 }
 \description{
 Calculates a quasi-rsquared value for non linear least squares regression
@@ -39,26 +39,9 @@ RSS is the residual sum of squares given by deviance(mdl)
 TSS is given by how much variance there is in the dependent variable:
 
 (n - 1)*var(y)
-
-%% ~~ If necessary, more details than the description above ~~
-}
-\note{
-%% ~~further notes~~
 }
 \examples{
 
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (mdl, n, param) 
-{
-    adj <- (sum(!is.na(y)) - 1)/(sum(!is.na(y)) - param)
-    sum.sq <- (sum(!is.na(y)) - 1) * var(y, na.rm = TRUE)
-    rsq <- 1 - (adj * (deviance(mdl)/sum.sq))
-    return(rsq)
-  }
 
 }
 \author{
@@ -71,9 +54,4 @@ research: a Monte Carlo approach. BMC pharmacology, 10, 6.
 
 http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model
 }
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
-\keyword{~kwd1}
-\keyword{~kwd2}
 

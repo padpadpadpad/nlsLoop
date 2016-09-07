@@ -26,13 +26,6 @@ Sharpe-Schoolfield equation. Used in tandem with schoolfield.high
 }
 \examples{
 Topt(4, 315, 0.6)
-312.6682
-
-Topt(4, 315, 0.6, 'N')
-39.51823
-
-312.6682 - 273.15 = 39.5182
-
 }
 \author{
 Daniel Padfield

@@ -24,11 +24,6 @@ schoolfield.high(ln.c, Ea, Eh, Th, temp, Tc)
 Models the thermal performance curve for metabolism using a modified thermal
 performance curve.
 }
-\examples{
-
-
-
-}
 \author{
 Daniel Padfield
 }

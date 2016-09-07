@@ -13,13 +13,6 @@
 #' @author Daniel Padfield
 #' @examples
 #' Topt(4, 315, 0.6)
-#' 312.6682
-#'
-#' Topt(4, 315, 0.6, 'N')
-#' 39.51823
-#'
-#' 312.6682 - 273.15 = 39.5182
-#'
 #' @export
 Topt <- function(Eh, Th, Ea, K = c('Y', 'N')){
   if(missing(K)) return((Eh*Th)/(Eh + (8.62e-05 *Th*log((Eh/Ea) - 1))))
