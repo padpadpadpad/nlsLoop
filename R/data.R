@@ -5,15 +5,15 @@
 #' @format A data frame with 649 rows and 7 variables:
 #' \describe{
 #'   \item{curve_id}{a unique value for each separate curve}
-#'   \item{temp}{the assay temperature at which the metabolic rate was measured (ºC)}
-#'   \item{growth.temp}{the growth temperature that the culture was maintained at before measurements were taken (ºC)}
+#'   \item{temp}{the assay temperature at which the metabolic rate was measured (degrees centigrade)}
+#'   \item{growth.temp}{the growth temperature that the culture was maintained at before measurements were taken (degrees centigrade)}
 #'   \item{process}{whether the cultures had been kept for a long time at their growth temperature (adaptation/~100 generations) or a short time (a measure of acclimation/~10 generations)}
 #'   \item{rep}{the replicate of the curve (1, 2 or 3)}
 #'   \item{flux}{whether the curve depicts respiration or gross photosynthesis}
-#'   \item{ln.rate}{the metabolic rate measured (µmol O2 µg C-1 hr-1)}
+#'   \item{ln.rate}{the metabolic rate measured (micro mol O2 micro gram C-1 hr-1)}
 #' }
 #' @source Daniel Padfield
-#' @references Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton, Ecology Letters, 19, 133–142.
+#' @references Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton, Ecology Letters, 19, 133-142.
 #' @keywords dataset
 #' @docType data
 #' @usage data("Chlorella_TRC")
