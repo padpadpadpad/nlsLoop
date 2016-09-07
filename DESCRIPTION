@@ -1,8 +1,8 @@
 Package: nlsLoop
-Title: Tools for shotgunning best fits for non-least squares regression
-Version: 0.0.0.9000
+Title: Tools for finding the best fits for non-least squares regression over the level of a factor
+Version: 1.0
 Authors@R: person("Daniel", "Padfield", email = "dp323@exeter.ac.uk", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: Provides a way of better fitting multiple non-linear models over a factor in a dataset by allowing multiple starting parameters to be used.
 Depends:
     R (>= 3.2.1)
 License: GPL-3
