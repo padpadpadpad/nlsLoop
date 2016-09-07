@@ -9,9 +9,9 @@
 #' @param Eh high temperature de-activation energy (eV)
 #' @param Th temperature at which enzyme is 1/2 active and 1/2 High-T suppressed
 #' @param temp temperature in K
-#' @param Tc standardisation temperature (in ºC, arbitrary)
+#' @param Tc standardisation temperature (in degrees centigrade, arbitrary)
 #' @author Daniel Padfield
-#' @references Schoolfield, R. M., Sharpe, P. J. & Magnuson, C. E. Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theor. Biol. 88, 719–731 (1981)
+#' @references Schoolfield, R. M., Sharpe, P. J. & Magnuson, C. E. Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theor. Biol. 88, 719-731 (1981)
 #' @export
 
 schoolfield.high <- function(ln.c,Ea,Eh,Th,temp, Tc) {

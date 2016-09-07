@@ -18,7 +18,7 @@ schoolfield.high(ln.c, Ea, Eh, Th, temp, Tc)
 
 \item{temp}{temperature in K}
 
-\item{Tc}{standardisation temperature (in ºC, arbitrary)}
+\item{Tc}{standardisation temperature (in degrees centigrade, arbitrary)}
 }
 \description{
 Models the thermal performance curve for metabolism using a modified thermal
@@ -28,6 +28,6 @@ performance curve.
 Daniel Padfield
 }
 \references{
-Schoolfield, R. M., Sharpe, P. J. & Magnuson, C. E. Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theor. Biol. 88, 719–731 (1981)
+Schoolfield, R. M., Sharpe, P. J. & Magnuson, C. E. Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theor. Biol. 88, 719-731 (1981)
 }
 
