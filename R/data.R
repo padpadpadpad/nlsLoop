@@ -5,11 +5,11 @@
 #' @format A data frame with 649 rows and 7 variables:
 #' \describe{
 #'   \item{curve_id}{a unique value for each separate curve}
-#'   \item{temp}{the assay temperature at which the metabolic rate was measured (degrees centigrade)}
 #'   \item{growth.temp}{the growth temperature that the culture was maintained at before measurements were taken (degrees centigrade)}
 #'   \item{process}{whether the cultures had been kept for a long time at their growth temperature (adaptation/~100 generations) or a short time (a measure of acclimation/~10 generations)}
-#'   \item{rep}{the replicate of the curve (1, 2 or 3)}
 #'   \item{flux}{whether the curve depicts respiration or gross photosynthesis}
+#'   \item{temp}{the assay temperature at which the metabolic rate was measured (degrees centigrade)}
+#'   \item{K}{the assay temperature in degrees Kelvin}
 #'   \item{ln.rate}{the metabolic rate measured (micro mol O2 micro gram C-1 hr-1)}
 #' }
 #' @source Daniel Padfield
