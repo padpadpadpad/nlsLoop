@@ -45,7 +45,7 @@
 
 nlsLoop <-
   # arguments needed for nlsLoop ####
-  function(model, data, tries, id_col, param_bds, r2 = 'N', supp.errors = 'N', AICc = 'Y', control,...){
+  function(model, data, tries, id_col, param_bds, r2 = c('N', 'Y'), supp.errors = c('N', 'Y'), AICc = c('Y', 'N'), control,...){
 
     # checking whether MuMIn is installed
     if (!requireNamespace("MuMIn", quietly = TRUE)){
