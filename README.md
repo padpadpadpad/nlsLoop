@@ -22,4 +22,8 @@ OR
 
 `ghit::install_github("padpadpadpad/nlsLoop")`
 
+### Help with running nlsLoop :
+
+A tutorial for running nlsLoop::nlsLoop() has been published on my [blog](http://padpadpadpad.github.io/2016-09-08-nlsLoop/)
+
 
