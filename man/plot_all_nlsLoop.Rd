@@ -23,9 +23,13 @@ plot a pdf of all curves fitted with nlsLoop
 Creates a pdf where each new page is a graph of one level of \code{id_col} with raw data and corresponding predictions.
 }
 \examples{
-data("Chlorella_TRC")
+data(Chlorella_TRC)
+Chlorella_TRC_test <- Chlorella_TRC[Chlorella_TRC$curve_id \%in\% c(1:10),]
+
+# run nlsLoop()
+
 fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
-                data = Chlorella_TRC,
+                data = Chlorella_TRC_test,
                 tries = 500,
                 id_col = 'curve_id',
                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
@@ -33,7 +37,7 @@ fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
 
 \dontrun{
 
-plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', raw_data = Chlorella_TRC, param_data = fits)
+plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', raw_data = Chlorella_TRC_test, param_data = fits)
 }
 }
 \author{

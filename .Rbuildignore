@@ -2,3 +2,5 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 ^nlsLoop_check\.R$
+^revdep$
+^cran-comments\.md$

@@ -58,11 +58,12 @@ parameter estimates
 # load in data
 
 data("Chlorella_TRC")
+Chlorella_TRC_test <- Chlorella_TRC[Chlorella_TRC$curve_id \%in\% c(1:10),]
 
 # run nlsLoop()
 
 fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
-                data = Chlorella_TRC,
+                data = Chlorella_TRC_test,
                 tries = 500,
                 id_col = 'curve_id',
                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
