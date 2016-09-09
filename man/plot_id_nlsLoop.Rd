@@ -7,17 +7,29 @@
 plot_id_nlsLoop(raw_data, param_data, id)
 }
 \arguments{
-\item{raw_data}{The data frame containing the data used in the nlsLoop argument}
+\item{raw_data}{the data frame containing the data used in the nlsLoop argument.}
 
-\item{param_data}{The nlsLoop object}
+\item{param_data}{the nlsLoop object.}
 
-\item{id}{The level of id_col from which the plot is desired}
+\item{id}{the level of \code{id_col} from which the plot is desired.}
 }
 \value{
 a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
 }
 \description{
 Creates a graph of one of the levels of id_col with raw data and corresponding predictions
+}
+\examples{
+data("Chlorella_TRC")
+fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+                data = Chlorella_TRC,
+                tries = 500,
+                id_col = 'curve_id',
+                param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
+
+plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
+
 }
 \author{
 Daniel Padfield

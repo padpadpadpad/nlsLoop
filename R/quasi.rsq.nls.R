@@ -6,13 +6,10 @@
 #'
 #' @param mdl model object from which R^2 is desired. Used to calculate the
 #' residual sum of squares.
-#' @param y the dependent variable in the model.
+#' @param y a vector of the response variable from the model.
 #' @param param the number of parameters of the non-linear model
 #' @return value of r squared for specific non-linear model object
-#' @details #' Cautionary notes of whether its useful are provided in the stack overflow
-#' reference. A personal highlight of which is 'If someone asks for rope to
-#' hang themselves, its fine to give it to them (while performing due diligence
-#' by asking "are you sure you want to do this?")'
+#' @details cautionary notes of whether its useful are provided in \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{this} StackOverflow discussion reference. A personal highlight of which is 'If someone asks for rope to hang themselves, its fine to give it to them (while performing due diligence by asking "are you sure you want to do this?")'
 #'
 #' Calculated as :
 #'
@@ -30,7 +27,16 @@
 #' inadequate measure for nonlinear models in pharmacological and biochemical
 #' research: a Monte Carlo approach. BMC pharmacology, 10, 6.
 #'
-#' http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model
+#' \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{A StackOverflow discussion}
+#' @examples
+#' data(Chlorella_TRC)
+#' fit <- minpack.lm::nlsLM(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+#'                 data = Chlorella_TRC[Chlorella_TRC$curve_id == 1,],
+#'                 start = c(ln.c = -1.2, Ea = 0.95, Eh = 5, Th = 315))
+#'
+#' quasi.rsq.nls(fit, Chlorella_TRC[Chlorella_TRC$curve_id == 1,]$ln.rate, 4)
+#'
+#' 0.4608054
 #' @export
 quasi.rsq.nls <- function(mdl, y, param){
   adj <- (sum(!is.na(y)) - 1)/(sum(!is.na(y)) - param)

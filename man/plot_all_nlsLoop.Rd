@@ -7,11 +7,11 @@
 plot_all_nlsLoop(file_name, raw_data, param_data)
 }
 \arguments{
-\item{file_name}{The desired path for the pdf to be saved to}
+\item{file_name}{the desired path for the pdf to be saved to.}
 
-\item{raw_data}{The data frame containing the data used in the nlsLoop argument}
+\item{raw_data}{the data frame containing the data used in the nlsLoop argument}
 
-\item{param_data}{The nlsLoop object}
+\item{param_data}{the nlsLoop object}
 }
 \value{
 a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
@@ -20,7 +20,21 @@ a plot using ggplot2 of the raw points and predictions of a single level of \cod
 plot a pdf of all curves fitted with nlsLoop
 }
 \details{
-Creates a pdf where each new page is a graph of one level of id_col with raw data and corresponding predictions
+Creates a pdf where each new page is a graph of one level of \code{id_col} with raw data and corresponding predictions.
+}
+\examples{
+data("Chlorella_TRC")
+fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+                data = Chlorella_TRC,
+                tries = 500,
+                id_col = 'curve_id',
+                param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
+
+\dontrun{
+
+plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', raw_data = Chlorella_TRC, param_data = fits)
+}
 }
 \author{
 Daniel Padfield

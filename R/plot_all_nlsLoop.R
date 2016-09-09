@@ -2,13 +2,25 @@
 #'
 #' plot a pdf of all curves fitted with nlsLoop
 #'
-#' Creates a pdf where each new page is a graph of one level of id_col with raw data and corresponding predictions
-#' @param file_name The desired path for the pdf to be saved to
-#' @param raw_data The data frame containing the data used in the nlsLoop argument
-#' @param param_data The nlsLoop object
+#' Creates a pdf where each new page is a graph of one level of \code{id_col} with raw data and corresponding predictions.
+#' @param file_name the desired path for the pdf to be saved to.
+#' @param raw_data the data frame containing the data used in the nlsLoop argument
+#' @param param_data the nlsLoop object
 #' @author Daniel Padfield
 #' @return a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
+#' @examples
+#' data("Chlorella_TRC")
+#' fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+#'                 data = Chlorella_TRC,
+#'                 tries = 500,
+#'                 id_col = 'curve_id',
+#'                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+#'                 lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
 #'
+#' \dontrun{
+#'
+#' plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', raw_data = Chlorella_TRC, param_data = fits)
+#' }
 #' @export plot_all_nlsLoop
 
 plot_all_nlsLoop <- function(file_name, raw_data, param_data){

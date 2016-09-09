@@ -5,66 +5,78 @@
 \title{Loops through a non-linear model on many different curves to find the best
 possible fit.}
 \usage{
-nlsLoop(model, data, tries, id_col, param_bds, r2 = "N", supp.errors = "N",
-  AICc = "Y", control, ...)
+nlsLoop(model, data, tries, id_col, param_bds, r2 = c("Y", "N"),
+  supp.errors = c("Y", "N"), AICc = c("Y", "N"), control, ...)
 }
 \arguments{
-\item{model}{The formula that is usually fed into nlsLM. Make sure there is
-a y and an x (the column in your dataframe that is the explanatory variable)
-eg. ln.resp.cor ~ schoolfield.high(ln.c, Ea, Eh, Th, temp=K, Tc = 25)}
+\item{model}{a non-linear model formula, with the response on the left of a ~ operatory and an expression involving parameters on the right.}
 
-\item{data}{Data that includes the rates}
+\item{data}{the raw data frame.}
 
-\item{tries}{Number of combinations of different starting parameters that
+\item{tries}{number of combinations of starting parameters that
 are tried on each curve.}
 
-\item{id_col}{The column name that identifies each curve that is to be
-fitted. Needs to be in speech marks, ' '.}
+\item{id_col}{the column name that identifies each curve that is to be
+fitted in "".}
 
-\item{param_bds}{Upper and lower boundaries for the start parameters. If
+\item{param_bds}{upper and lower boundaries for the start parameters. If
 missing these default to +/- 1e+09. Need to specified as a vector as :
 c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
 param 2 etc)}
 
-\item{r2}{Whether or not you want the quasi rsquared value to be returned.
-This defaults to no, (so not specifying the argument or r2 = 'N' results in
-no r2 values being returned), to include the r2 values use r2 = 'Y'}
+\item{r2}{whether or not you want the quasi rsquared value to be returned.
+This defaults to no, to include the r2 values use \code{r2 = 'Y'}.}
 
-\item{supp.errors}{If supp.errors = 'Y' then no error messages will be shown
+\item{supp.errors}{if \code{supp.errors = 'Y'}, then no error messages will be shown
 from the actual nlsLM function, reducing the number of error messages
 received while the model works through starting parameters from which the
 model cannot converge. Advised to only be used once it is expected that
 error messages in the nlsLM function are not important.}
 
-\item{AICc}{Whether or not the small sample AIC should be used. Defaults to
-'Y'. Override this using AICc == 'N'. AICc should be used instead of AIC
+\item{AICc}{whether or not the small sample AIC should be used. Defaults to
+\code{'Y'}. Override this using \code{AICc == 'N'}. AICc should be used instead of AIC
 when sample size is small in comparison to the number of estimated
-parameters (Burnham & Anderson 2002 recommend its use when n / K < 40).}
+parameters (Burnham & Anderson 2002 recommend its use when n / n.param < 40).}
 
-\item{control}{If specific control arguments are desired they can be specified using nls.lm.control here}
+\item{control}{if specific control arguments are desired they can be specified using \code{\link[minpack.lm]{nls.lm.control}}.}
 
-\item{\dots}{Extra arguments to pass to nlsLM if necessary.}
+\item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.}
 }
 \value{
-returns a list of objects which includes a parameter dataframe of the best estimated parameter fits for each level of `id_col` with associated AIC score.
-
-Returns a list of class nlsLoop. Notable elements within the list are $params and $predictions that give the best fit parameters and predictions based on these parameters.
+returns a list of class \code{nlsLoop}. Notable elements within the list are \code{$params} and \code{$predictions} that give the best fit parameters and predictions based on these parameters.
 }
 \description{
 Fits the best possible model to each of a set of curves using non-linear
-least squares regression using nlsLM. The best fit is determined using AIC
-scores.
+least squares regression using minpack.lm::nlsLM(). The best fit is determined using AIC scores.
 }
 \note{
-Useful additional arguments for nlsLM include: na.action = na.omit,
-lower/upper = c() where these represent upper and lower boundaries for
+Useful additional arguments for \code{\link[minpack.lm]{nlsLM}} include: \code{na.action = na.omit},
+\code{lower/upper = c()} where these represent upper and lower boundaries for
 parameter estimates
+}
+\examples{
+# load in data
+
+data("Chlorella_TRC")
+
+# run nlsLoop()
+
+fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+                data = Chlorella_TRC,
+                tries = 500,
+                id_col = 'curve_id',
+                param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
+
 }
 \author{
 Daniel Padfield
-\code{\link[nlsLoop]{quasi.rsq.nls}} for details on the calculation of r squared
-values for non linear models.
+}
+\seealso{
+\code{\link[nlsLoop]{quasi.rsq.nls}} for details on the calculation of r squared values for non linear models.
+
 \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
+
 \code{\link[MuMIn]{AICc}} for application of AICc.
 }
 
