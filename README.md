@@ -26,16 +26,8 @@ A more in-depth tutorial and explanation of parameters in `nlsLoop()` can be fou
 #### 1. Installation
 
 ``` r
-
+# install package
 devtools::install_github("padpadpadpad/nlsLoop")
-
-# OR
-
-ghit::install_github("padpadpadpad/nlsLoop")
-#> Warning: unable to access index for repository @CRAN@/src/contrib:
-#>   scheme not supported in URL '@CRAN@/src/contrib/PACKAGES'
-#> padpadpadpad/nlsLoop 
-#>                "1.0"
 
 # load in nlsLoop
 library(nlsLoop)
@@ -47,6 +39,7 @@ library(nlsLoop)
 # load in example data set
 data("Chlorella_TRC")
 
+# run nlsLoop
 fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
                 data = Chlorella_TRC,
                 tries = 500,
@@ -75,6 +68,7 @@ head(fits$params)
 #### 4. Check fit of single curve
 
 ``` r
+# plot a single curve
 plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
 ```
 
@@ -83,5 +77,6 @@ plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
 #### 5. Check fit of all curves (Creates a pdf)
 
 ``` r
+# create pdf of each curve
 plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_TRC, param_data = fits)
 ```
