@@ -44,14 +44,14 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y){
                   shiny::plotOutput("plot1",
                            click = "plot1_click")),
       miniUI::miniButtonBlock(
-        actionButton("undo_last_point", "Undo"),
-        actionButton("go_to_next", "Next")
+        shiny::actionButton("undo_last_point", "Undo"),
+        shiny::actionButton("go_to_next", "Next")
       )
     )
 
     server <- function(input, output, session){
       # For storing which rows have been excluded
-      vals <- reactiveValues(
+      vals <- shiny::reactiveValues(
         deleted_rows = data[FALSE,]
       )
 
