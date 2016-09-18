@@ -13,4 +13,6 @@ Imports: minpack.lm,
     MuMIn,
     plyr,
     stats,
-    grDevices
+    grDevices,
+    shiny,
+    miniUI
