@@ -88,7 +88,7 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y){
       # Make points that are clicked turn grey
       shiny::observeEvent(input$plot1_click,{
         dat <- data[data[,id_col] == input$data,]
-        vals$deleted_rows <- rbind(vals$deleted_rows, nearPoints(dat, input$plot1_click, allRows = FALSE))
+        vals$deleted_rows <- rbind(vals$deleted_rows, shiny::nearPoints(dat, input$plot1_click, allRows = FALSE))
       })
 
       # Undo last click
