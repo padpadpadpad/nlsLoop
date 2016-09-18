@@ -41,8 +41,10 @@ fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
                 lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
 
+\dontrun{
 outliers <- nlsViewer(data = Chlorella_TRC_test, predictions = fits$predictions,
 id_col = 'curve_id', x = 'K', y = 'ln.rate')
+}
 
 }
 
