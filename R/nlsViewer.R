@@ -10,7 +10,7 @@
 #' @return a dataframe of the rows that are to be deleted
 #' @description opens a pane from which you can select each set of data and select points to be dropped. The undo button gets rid of the last selection. Press "DONE" to get a dataframe of the selected outliers.
 #' @examples
-#' load in data
+#' # load in data
 #'
 #' data("Chlorella_TRC")
 #' Chlorella_TRC_test <- Chlorella_TRC[Chlorella_TRC$curve_id %in% c(1:10),]
@@ -24,7 +24,8 @@
 #'                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
 #'                 lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
 #'
-#' outliers <- nlsViewer(data = Chlorella_TRC_test, predictions = fits$predictions, id_col = 'curve_id', x = 'K', y = 'ln.rate')
+#' outliers <- nlsViewer(data = Chlorella_TRC_test, predictions = fits$predictions,
+#' id_col = 'curve_id', x = 'K', y = 'ln.rate')
 #'
 #' @export
 
