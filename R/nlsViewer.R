@@ -7,6 +7,7 @@
 #' @param id_col the column that splits your data frame by
 #' @param x the x variable
 #' @param y the y variable
+#' @param stat_smooth whether or not you want a linear model fit to be superimposed over the data. Defaults to FALSE
 #' @return a dataframe of the rows that are to be deleted
 #' @description opens a pane from which you can select each set of data and select points to be dropped. The undo button gets rid of the last selection. Press "DONE" to get a dataframe of the selected outliers.
 #' @examples
@@ -31,7 +32,7 @@
 #'
 #' @export
 
-nlsViewer <- function(data, predictions = NULL, id_col, x, y){
+nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALSE){
 
     # create all id_col
     id <- as.character(unique(data[,id_col]))
@@ -44,7 +45,9 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y){
       miniUI::miniContentPanel(
                   shiny::selectInput("data", "Choose curve:", choices = id),
                   shiny::plotOutput("plot1",
-                           click = "plot1_click")),
+                           click = "plot1_click",
+                           brush = shiny::brushOpts(id = 'plot1_brush',
+                                                    resetOnNew = TRUE))),
       miniUI::miniButtonBlock(
         shiny::actionButton("undo_last_point", "Undo"),
         shiny::actionButton("go_to_next", "Next")
@@ -54,6 +57,7 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y){
     server <- function(input, output, session){
       # For storing which rows have been excluded
       vals <- shiny::reactiveValues(
+        last_selection = data[FALSE,],
         deleted_rows = data[FALSE,]
       )
 
@@ -67,13 +71,22 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y){
 
         # no predictions
         if(is.null(predictions)){
-          # plot 1
-          ggplot2::ggplot() +
-            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
-            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, exclude, alpha = 0.25) +
-            ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
-            ggplot2::ggtitle(input$data)
-        }   else {
+          if(stat_smooth == TRUE){
+            # plot 1
+            ggplot2::ggplot() +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, exclude, alpha = 0.25) +
+              ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
+              ggplot2::ggtitle(input$data) +
+              ggplot2::stat_smooth(ggplot2::aes_string(x = x, y = y), method = 'lm', col = 'red', fill = 'red', data = keep, se = T)
+          } else{
+            ggplot2::ggplot() +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, exclude, alpha = 0.25) +
+              ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
+              ggplot2::ggtitle(input$data)
+            }
+          } else {
           # with predictions
           preds <- predictions[predictions[,id_col] == input$data,]
           # plot 1
@@ -90,13 +103,21 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y){
       # Make points that are clicked turn grey
       shiny::observeEvent(input$plot1_click,{
         dat <- data[data[,id_col] == input$data,]
+        vals$last_selection <- shiny::nearPoints(dat, input$plot1_click, allRows = FALSE)
         vals$deleted_rows <- rbind(vals$deleted_rows, shiny::nearPoints(dat, input$plot1_click, allRows = FALSE))
+      })
+
+      shiny::observeEvent(input$plot1_brush,{
+        dat <- data[data[,id_col] == input$data,]
+        vals$last_selection <- shiny::brushedPoints(dat, input$plot1_brush, allRows = FALSE)
+        vals$deleted_rows <- rbind(vals$deleted_rows, shiny::brushedPoints(dat, input$plot1_brush, allRows = FALSE))
       })
 
       # Undo last click
       shiny::observeEvent(input$undo_last_point,{
-        vals$deleted_rows <- vals$deleted_rows[-nrow(vals$deleted_rows),]
-      })
+        vals$deleted_rows <- vals$deleted_rows[! rownames(vals$deleted_rows) %in% row.names(vals$last_selection),]
+        vals$last_selection <- data[FALSE,]
+       })
 
       # Move to next id
       shiny::observeEvent(input$go_to_next, {
