@@ -75,14 +75,14 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
             # plot 1
             ggplot2::ggplot() +
               ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
-              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, col = 'black', size = 3, exclude, alpha = 0.25) +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, size = 3, exclude, alpha = 0.75) +
               ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
               ggplot2::ggtitle(input$data) +
               ggplot2::stat_smooth(ggplot2::aes_string(x = x, y = y), method = 'lm', col = 'red', fill = 'red', data = keep, se = T)
           } else{
             ggplot2::ggplot() +
               ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
-              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, col = 'black', size = 3, exclude, alpha = 0.25) +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, size = 3, exclude, alpha = 0.75) +
               ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
               ggplot2::ggtitle(input$data)
             }
@@ -92,8 +92,8 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
           # plot 1
           ggplot2::ggplot() +
             ggplot2::geom_line(ggplot2::aes_string(x = x, y = y), col = 'red', linetype = 2, size = 1.5, preds) +
-            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, col = 'black', size = 3, keep) +
-            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, exclude, alpha = 0.25) +
+            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
+            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, size = 3, exclude, alpha = 0.75) +
             ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
             ggplot2::ggtitle(input$data)
             }
