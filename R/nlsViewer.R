@@ -57,8 +57,8 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
     server <- function(input, output, session){
       # For storing which rows have been excluded
       vals <- shiny::reactiveValues(
-        last_selection = data[FALSE,],
-        deleted_rows = data[FALSE,]
+        deleted_rows = data[FALSE,],
+        number_of_points = NULL
       )
 
       # Define plot1
@@ -103,21 +103,24 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
       # Make points that are clicked turn grey
       shiny::observeEvent(input$plot1_click,{
         dat <- data[data[,id_col] == input$data,]
-        vals$last_selection <- shiny::nearPoints(dat, input$plot1_click, allRows = FALSE)
+        vals$number_of_points <- c(vals$number_of_points, 1)
         vals$deleted_rows <- rbind(vals$deleted_rows, shiny::nearPoints(dat, input$plot1_click, allRows = FALSE))
       })
 
       shiny::observeEvent(input$plot1_brush,{
         dat <- data[data[,id_col] == input$data,]
-        vals$last_selection <- shiny::brushedPoints(dat, input$plot1_brush, allRows = FALSE)
+        vals$number_of_points <- c(vals$number_of_points, nrow(shiny::brushedPoints(dat, input$plot1_brush, allRows = FALSE)))
         vals$deleted_rows <- rbind(vals$deleted_rows, shiny::brushedPoints(dat, input$plot1_brush, allRows = FALSE))
       })
 
       # Undo last click
       shiny::observeEvent(input$undo_last_point,{
-        vals$deleted_rows <- vals$deleted_rows[! rownames(vals$deleted_rows) %in% row.names(vals$last_selection),]
-        vals$last_selection <- data[FALSE,]
-       })
+        last_row <- tail(vals$number_of_points, 1)
+        vals$number_of_points <- vals$number_of_points[-length(vals$number_of_points)]
+
+        vals$deleted_rows <- head(vals$deleted_rows, nrow(vals$deleted_rows) - last_row)
+
+      })
 
       # Move to next id
       shiny::observeEvent(input$go_to_next, {
@@ -129,9 +132,7 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
         deleted_rows <- vals$deleted_rows
         # Return the kept points ###
         shiny::stopApp(
-          list(
-            data = deleted_rows
-          )
+          deleted_rows
         )
       })
 
