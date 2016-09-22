@@ -127,14 +127,14 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
       shiny::observeEvent(input$go_to_next, {
         current_id <- input$data
         next_id <- id[match(current_id, id) + 1]
-        updateSelectInput(session, 'data', choices = id, selected = next_id)
+        shiny::updateSelectInput(session, 'data', choices = id, selected = next_id)
         })
 
       # Move to previous id
       shiny::observeEvent(input$go_to_previous, {
         current_id <- input$data
         next_id <- id[match(current_id, id) - 1]
-        updateSelectInput(session, 'data', choices = id, selected = next_id)
+        shiny::updateSelectInput(session, 'data', choices = id, selected = next_id)
       })
 
       # When the Done button is clicked, return a value
