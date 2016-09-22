@@ -49,6 +49,7 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
                            brush = shiny::brushOpts(id = 'plot1_brush',
                                                     resetOnNew = TRUE))),
       miniUI::miniButtonBlock(
+        shiny::actionButton("go_to_previous", "Previous"),
         shiny::actionButton("undo_last_point", "Undo"),
         shiny::actionButton("go_to_next", "Next")
       )
@@ -124,7 +125,16 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
 
       # Move to next id
       shiny::observeEvent(input$go_to_next, {
+        current_id <- input$data
+        next_id <- id[match(current_id, id) + 1]
+        updateSelectInput(session, 'data', choices = id, selected = next_id)
+        })
 
+      # Move to previous id
+      shiny::observeEvent(input$go_to_previous, {
+        current_id <- input$data
+        next_id <- id[match(current_id, id) - 1]
+        updateSelectInput(session, 'data', choices = id, selected = next_id)
       })
 
       # When the Done button is clicked, return a value
