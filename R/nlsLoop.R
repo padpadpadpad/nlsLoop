@@ -125,6 +125,7 @@ nlsLoop <-
 
   # create a dataframe to output model results into ####
   res <- data.frame(id_col = id)
+  res[,1] <- as.character(res[,1])
   res[,2:(nrow(params_bds) + 1)] <- 0
   colnames(res) <- c(id_col, params_bds$param)
   res$AIC <- 0
@@ -207,6 +208,10 @@ nlsLoop <-
   if(supp.errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
   if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi.r2 for details.', call. = F)}
 
+  # delete fits that simply have not worked
+  res_edit <- res[!(rowSums(res[,2:ncol(res)]) == 0),]
+  id_edit <- unique(res_edit[,id_col])
+
   # creating a predict dataframe ####
   predict.nlsLoop <- function(x, data. = data, params_ind. = params_ind, formula. = formula, params_est. = params_est, id_col. = id_col){
 
@@ -236,8 +241,9 @@ nlsLoop <-
   }
   else{
 
-  preds <- plyr::ldply(split(res, id), predict.nlsLoop)
+  preds <- plyr::ldply(split(res_edit, id_edit), predict.nlsLoop)
   preds <- preds[,c(3,2,4)]
+  preds[,1] <- as.character(preds[,1])
 
   ### setting up a list return object
   val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res, predictions = preds)
