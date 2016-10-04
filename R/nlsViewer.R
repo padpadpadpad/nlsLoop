@@ -33,17 +33,22 @@
 #'
 #' @export
 
-nlsViewer <- function(data, predictions = NULL, id_col, x, y, col = NULL, lm_fit = FALSE){
+nlsViewer <- function(data, predictions = NULL, id_col = NULL, x, y, col = NULL, lm_fit = FALSE){
 
     # delete NAs from dataset
     data <- data[!is.na(data[,y]),]
     data <- data[!is.na(data[,x]),]
 
-    # create all id_col
-    id <- unique(as.character(data[,id_col]))
-
     # colnames
     cols <- colnames(data)
+
+    # one id column
+    if(is.null(id_col)){
+      id_col <-  'id_col'
+      data$id_col <- 'ALL THE DATA'}
+
+    # create all id_col
+    id <- unique(as.character(data[,id_col]))
 
     # if missing col
     if(is.null(col)){
