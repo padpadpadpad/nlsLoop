@@ -7,7 +7,8 @@
 #' @param id_col the column that splits your data frame by
 #' @param x the x variable
 #' @param y the y variable
-#' @param stat_smooth whether or not you want a linear model fit to be superimposed over the data. Defaults to FALSE
+#' @param col an optional variable if different colours are desired for each plot
+#' @param lm_fit whether or not you want a linear model fit to be superimposed over the data. Defaults to FALSE
 #' @return a dataframe of the rows that are to be deleted
 #' @description opens a pane from which you can select each set of data and select points to be dropped. The undo button gets rid of the last selection. Press "DONE" to get a dataframe of the selected outliers.
 #' @examples
@@ -32,10 +33,21 @@
 #'
 #' @export
 
-nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALSE){
+nlsViewer <- function(data, predictions = NULL, id_col, x, y, col = NULL, lm_fit = FALSE){
+
+    # delete NAs from dataset
+    data <- data[!is.na(data[,y]),]
+    data <- data[!is.na(data[,x]),]
 
     # create all id_col
-    id <- as.character(unique(data[,id_col]))
+    id <- unique(as.character(data[,id_col]))
+
+    # colnames
+    cols <- colnames(data)
+
+    # if missing col
+    if(is.null(col)){
+      data$col <- 'black'}
 
     # define the UI for the gadget
     ui <- miniUI::miniPage(
@@ -64,7 +76,6 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
 
       # Define plot1
       output$plot1 <- shiny::renderPlot({
-        # create y variable and x variable
         # subset for keep rows
         dat <- data[data[,id_col] == input$data,]
         keep    <- dat[! rownames(dat) %in% row.names(vals$deleted_rows),]
@@ -72,18 +83,21 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
 
         # no predictions
         if(is.null(predictions)){
-          if(stat_smooth == TRUE){
+          if(lm_fit == TRUE){
+
+            ggplot2::update_geom_defaults("smooth", list(colour = 'red', fill = 'red'))
+
             # plot 1
             ggplot2::ggplot() +
-              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
-              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, size = 3, exclude, alpha = 0.75) +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col), size = 3, keep) +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col), shape = 21, size = 3, exclude, alpha = 0.75) +
               ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
               ggplot2::ggtitle(input$data) +
-              ggplot2::stat_smooth(ggplot2::aes_string(x = x, y = y), method = 'lm', col = 'red', fill = 'red', data = keep, se = T)
+              ggplot2::stat_smooth(ggplot2::aes_string(x = x, y = y, col = col, fill = col), method = 'lm', se = T, keep)
           } else{
             ggplot2::ggplot() +
-              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
-              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, size = 3, exclude, alpha = 0.75) +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col), size = 3, keep) +
+              ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col), shape = 21, size = 3, exclude, alpha = 0.75) +
               ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
               ggplot2::ggtitle(input$data)
             }
@@ -93,8 +107,8 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
           # plot 1
           ggplot2::ggplot() +
             ggplot2::geom_line(ggplot2::aes_string(x = x, y = y), col = 'red', linetype = 2, size = 1.5, preds) +
-            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), col = 'black', size = 3, keep) +
-            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, size = 3, exclude, alpha = 0.75) +
+            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col), size = 3, keep) +
+            ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col), shape = 21, size = 3, exclude, alpha = 0.75) +
             ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
             ggplot2::ggtitle(input$data)
             }
@@ -140,6 +154,7 @@ nlsViewer <- function(data, predictions = NULL, id_col, x, y, stat_smooth = FALS
       # When the Done button is clicked, return a value
       shiny::observeEvent(input$done, {
         deleted_rows <- vals$deleted_rows
+        deleted_rows <- deleted_rows[,colnames(deleted_rows) %in% cols]
         # Return the kept points ###
         shiny::stopApp(
           deleted_rows
