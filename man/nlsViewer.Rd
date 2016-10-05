@@ -4,7 +4,8 @@
 \alias{nlsViewer}
 \title{an interactive addin to help evaluate the fits of nlsLoop}
 \usage{
-nlsViewer(data, predictions = NULL, id_col, x, y)
+nlsViewer(data, predictions = NULL, id_col = NULL, x, y, col = NULL,
+  lm_fit = FALSE)
 }
 \arguments{
 \item{data}{the data frame that contains your raw data}
@@ -16,6 +17,10 @@ nlsViewer(data, predictions = NULL, id_col, x, y)
 \item{x}{the x variable}
 
 \item{y}{the y variable}
+
+\item{col}{an optional variable if different colours are desired for each plot}
+
+\item{lm_fit}{whether or not you want a linear model fit to be superimposed over the data. Defaults to FALSE}
 }
 \value{
 a dataframe of the rows that are to be deleted
