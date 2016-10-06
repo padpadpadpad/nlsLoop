@@ -8,7 +8,7 @@
 #' @param x the x variable
 #' @param y the y variable
 #' @param col an optional variable if different colours are desired for each plot
-#' @param group an optional variable for grouping non-linear model predictions when there are multiple prediction lines on a single plot
+#' @param group an optional variable for grouping model predictions when there are multiple prediction lines on a single plot
 #' @param lm_fit whether or not you want a linear model fit to be superimposed over the data. Defaults to FALSE
 #' @return a dataframe of the rows that are to be deleted
 #' @description opens a pane from which you can select each set of data and select points to be dropped. The undo button gets rid of the last selection. Press "DONE" to get a dataframe of the selected outliers.
