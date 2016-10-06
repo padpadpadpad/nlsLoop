@@ -5,7 +5,7 @@
 \title{an interactive addin to help evaluate the fits of nlsLoop}
 \usage{
 nlsViewer(data, predictions = NULL, id_col = NULL, x, y, col = NULL,
-  lm_fit = FALSE)
+  group = NULL, lm_fit = FALSE)
 }
 \arguments{
 \item{data}{the data frame that contains your raw data}
@@ -19,6 +19,8 @@ nlsViewer(data, predictions = NULL, id_col = NULL, x, y, col = NULL,
 \item{y}{the y variable}
 
 \item{col}{an optional variable if different colours are desired for each plot}
+
+\item{group}{an optional variable for grouping non-linear model predictions when there are multiple prediction lines on a single plot}
 
 \item{lm_fit}{whether or not you want a linear model fit to be superimposed over the data. Defaults to FALSE}
 }

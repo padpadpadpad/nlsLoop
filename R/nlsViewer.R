@@ -8,6 +8,7 @@
 #' @param x the x variable
 #' @param y the y variable
 #' @param col an optional variable if different colours are desired for each plot
+#' @param group an optional variable for grouping non-linear model predictions when there are multiple prediction lines on a single plot
 #' @param lm_fit whether or not you want a linear model fit to be superimposed over the data. Defaults to FALSE
 #' @return a dataframe of the rows that are to be deleted
 #' @description opens a pane from which you can select each set of data and select points to be dropped. The undo button gets rid of the last selection. Press "DONE" to get a dataframe of the selected outliers.
@@ -33,7 +34,7 @@
 #'
 #' @export
 
-nlsViewer <- function(data, predictions = NULL, id_col = NULL, x, y, col = NULL, lm_fit = FALSE){
+nlsViewer <- function(data, predictions = NULL, id_col = NULL, x, y, col = NULL, group = NULL, lm_fit = FALSE){
 
     # delete NAs from dataset
     data <- data[!is.na(data[,y]),]
@@ -53,6 +54,8 @@ nlsViewer <- function(data, predictions = NULL, id_col = NULL, x, y, col = NULL,
     # if missing col
     if(is.null(col)){
       data$col <- 'black'}
+    if(is.null(group)){
+      group = id_col}
 
     # define the UI for the gadget
     ui <- miniUI::miniPage(
@@ -86,11 +89,14 @@ nlsViewer <- function(data, predictions = NULL, id_col = NULL, x, y, col = NULL,
         keep    <- dat[! rownames(dat) %in% row.names(vals$deleted_rows),]
         exclude <- dat[rownames(dat) %in% row.names(vals$deleted_rows),]
 
+        ggplot2::update_geom_defaults("smooth", list(colour = 'red', fill = 'red'))
+        ggplot2::update_geom_defaults("line", list(colour = 'red', linetype = 2))
+
         # no predictions
         if(is.null(predictions)){
           if(lm_fit == TRUE){
 
-            ggplot2::update_geom_defaults("smooth", list(colour = 'red', fill = 'red'))
+
 
             # plot 1
             ggplot2::ggplot() +
@@ -111,7 +117,7 @@ nlsViewer <- function(data, predictions = NULL, id_col = NULL, x, y, col = NULL,
           preds <- predictions[predictions[,id_col] == input$data,]
           # plot 1
           ggplot2::ggplot() +
-            ggplot2::geom_line(ggplot2::aes_string(x = x, y = y), col = 'red', linetype = 2, size = 1.5, preds) +
+            ggplot2::geom_line(ggplot2::aes_string(x = x, y = y, col = col, group = group), linetype = 2, size = 1.5, preds) +
             ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col), size = 3, keep) +
             ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col), shape = 21, size = 3, exclude, alpha = 0.75) +
             ggplot2::theme_bw(base_size = 18, base_family = 'Helvetica') +
