@@ -4,7 +4,8 @@
 \alias{plot_all_nlsLoop}
 \title{plot_all_nlsLoop}
 \usage{
-plot_all_nlsLoop(file_name, raw_data, param_data)
+plot_all_nlsLoop(file_name, raw_data, param_data, id_col = NULL,
+  col_point = NULL, col_line = NULL, group = NULL, ...)
 }
 \arguments{
 \item{file_name}{the desired path for the pdf to be saved to.}
@@ -12,6 +13,14 @@ plot_all_nlsLoop(file_name, raw_data, param_data)
 \item{raw_data}{the data frame containing the data used in the nlsLoop argument}
 
 \item{param_data}{the nlsLoop object}
+
+\item{id_col}{an optional argument if a different column is desired from which each new plot panel is chosen}
+
+\item{col_point}{optional argument to control colour of points}
+
+\item{col_line}{optional argument to control colour of predictions}
+
+\item{group}{optional argument to ensure lines are grouped properly}
 }
 \value{
 a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
