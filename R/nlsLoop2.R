@@ -1,0 +1,207 @@
+#' Loops through a non-linear model on many different curves to find the best
+#' possible fit
+#'
+#' Fits the best possible model to each of a set of curves using non-linear
+#' least squares regression using minpack.lm::nlsLM(). Start parameters are found using nls2
+#'
+#' @param data the raw data frame.
+#' @param model a non-linear model formula, with the response on the left of a ~ operatory and an expression involving parameters on the right.
+#' @param tries number iterations to use on nls2 to find best parameters
+#' @param id_col the column name that identifies each curve that is to be
+#' fitted in "".
+#' @param param_bds upper and lower boundaries for the start parameters. If
+#' missing these default to +/- 1e+09. Need to specified as a vector as :
+#' c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
+#' param 2 etc)
+#' @param r2 whether or not you want the quasi rsquared value to be returned.
+#' This defaults to no, to include the r2 values use \code{r2 = 'Y'}.
+#' @param supp.errors if \code{supp.errors = 'Y'}, then no error messages will be shown
+#' from the actual nlsLM function, reducing the number of error messages
+#' received while the model works through starting parameters from which the
+#' model cannot converge. Advised to only be used once it is expected that
+#' error messages in the nlsLM function are not important.
+#' @param AICc whether or not the small sample AIC should be used. Defaults to
+#' \code{'Y'}. Override this using \code{AICc == 'N'}. AICc should be used instead of AIC
+#' when sample size is small in comparison to the number of estimated
+#' parameters (Burnham & Anderson 2002 recommend its use when n / n.param < 40).
+#' @param control if specific control arguments are desired they can be specified using \code{\link[minpack.lm]{nls.lm.control}}.
+#' @param alg the algorithm with which to scan for start parameters. See \code{\link[nls2]{nls2}} for details. Defaults to \code{plinear-random}
+#' @param \dots extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.
+#' @return returns a list of class \code{nlsLoop}. Notable elements within the list are \code{$params} and \code{$predictions} that give the best fit parameters and predictions based on these parameters.
+#' @note Useful additional arguments for \code{\link[minpack.lm]{nlsLM}} include: \code{na.action = na.omit},
+#' \code{lower/upper = c()} where these represent upper and lower boundaries for
+#' parameter estimates
+#' @author Daniel Padfield
+#' @seealso \code{\link[nlsLoop]{quasi.rsq.nls}} for details on the calculation of r squared values for non linear models.
+#'
+#' \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
+#'
+#' \code{\link[MuMIn]{AICc}} for application of AICc.
+#' @examples
+#' # load in data
+#'
+#' data("Chlorella_TRC")
+#' Chlorella_TRC_test <- Chlorella_TRC[Chlorella_TRC$curve_id %in% c(1:10),]
+#'
+#' # run nlsLoop()
+#'
+#' fits <- nlsLoop2(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+#'                 data = Chlorella_TRC_test,
+#'                 tries = 500,
+#'                 id_col = 'curve_id',
+#'                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+#'                 lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
+#'
+#' @export
+
+nlsLoop2 <-
+  # arguments needed for nlsLoop ####
+function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = c('Y', 'N'), AICc = c('Y', 'N'), control, alg, ...){
+
+  # set default values
+  if(missing(r2)){r2 <- 'N'}
+  if(missing(supp.errors)){supp.errors <- 'N'}
+  if(missing(AICc)){AICc <- 'Y'}
+  if(missing(alg)){alg <- 'plinear-random'}
+
+  # checking whether MuMIn is installed
+  if (!requireNamespace("MuMIn", quietly = TRUE)){
+    stop("The MuMIn package is needed for calculation of AICc. Please install. Can be bypassed by using classic AIC using AICc = 'N'",
+         call. = FALSE)
+  }
+
+  # create model ####
+  formula <- stats::as.formula(model)
+
+  # define parameters to estimate and independent variable ####
+  params_ind <- all.vars(formula[[3]])[all.vars(formula[[3]]) %in% colnames(data)]
+  params_est <- all.vars(formula[[3]])[! all.vars(formula[[3]]) %in% colnames(data)]
+
+  if(missing(param_bds)){
+    cat('No boundaries specified for the sought parameters. \n',
+        'Default values of +/- 1e+10 will be used. This is likely to slow the process of finding the best model. \n')
+    r <- readline("Continue with default values [y/n]? ")
+    if(tolower(r) == "y") {
+      param_bds <- rep(c(-Inf, Inf), times = length(params_est))
+    }
+    if(tolower(r) == "n"){
+      stop('Please enter upper and lower parameter boundaries as param_bds in function argument.')
+    }
+
+  }
+
+  params_bds = data.frame(matrix(param_bds, 2, length(params_est),
+                                 dimnames=list(c(), params_est)),
+                          stringsAsFactors=F)
+
+  # nlsLM controls - this can stay the same, potential to be overridden
+  if(missing(control)) {
+    control <- minpack.lm::nls.lm.control(maxiter = 1000, ftol = .Machine$double.eps, ptol = .Machine$double.eps)
+  }
+
+  # create a unique id vector
+  if(is.character(data[,id_col]) == F){data[,id_col] <- as.character(data[,id_col])}
+  id <- unique(data[,id_col])
+
+  # create a dataframe to output model results into ####
+  res <- data.frame(id_col = id)
+  res[,1] <- as.character(res[,1])
+  res[,2:(ncol(params_bds) + 1)] <- 0
+  colnames(res) <- c(id_col, colnames(params_bds))
+  res$AIC <- 0
+  res$quasi.r2 <- 0
+
+  # fit nls model using LM optimisation and using shotgun approach to get starting values ####
+  for (i in 1:length(id)){
+    fit <- NULL
+    # subset the dataframe to fit the model for each unique curve by id
+    data.fit <- data[data[,id_col] == id[i],]
+
+    fit.nls2 <- tryCatch(nls2::nls2(formula, data = data.fit, start = params_bds, alg = alg, control = nls.control(maxiter = tries), na.action = na.omit), silent = TRUE)
+
+    if(supp.errors == 'Y'){
+      try(fit <- minpack.lm::nlsLM(formula,
+                                   start=coef(fit.nls2)[params_est],
+                                   control = control,
+                                   data=data.fit, ...),
+          silent = TRUE)}
+    if(supp.errors != 'Y'){
+      try(fit <- minpack.lm::nlsLM(formula,
+                                   start=coef(fit.nls2)[params_est],
+                                   control = control,
+                                   data=data.fit, ...))}
+
+    # if it is the first fit of the model, output the results of the model in the dataframe
+    # if the AIC score of the next fit model is < the AIC of the fit in the dataframe, replace
+    if(AICc == 'N'){
+      if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > stats::AIC(fit)){
+        res[i, 'AIC'] <- stats::AIC(fit)
+        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsLoop::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        for(k in 1:length(params_est)){
+          res[i, params_est[k]] <- as.numeric(stats::coef(fit)[k])
+        }
+      }
+    }
+
+    else{
+
+      if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > MuMIn::AICc(fit)){
+
+        res[i, 'AIC'] <- MuMIn::AICc(fit)
+        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsLoop::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        for(k in 1:length(params_est)){
+          res[i, params_est[k]] <- as.numeric(stats::coef(fit)[k])
+        }
+      }
+    }
+  }
+  # warnings for res ####
+  if(r2 == 'N') {res <- res[,-grep('quasi.r2', colnames(res))]}
+  if(supp.errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
+  if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi.r2 for details.', call. = F)}
+
+  # delete fits that simply have not worked
+  res_edit <- res[!(rowSums(res[,2:ncol(res)]) == 0),]
+  id_edit <- unique(res_edit[,id_col])
+
+  # creating a predict dataframe ####
+  predict.nlsLoop <- function(x, data. = data, params_ind. = params_ind, formula. = formula, params_est. = params_est, id_col. = id_col){
+
+    # subset results data frame to contain just estimated parameters
+    est.param.val <- x[,names(x) %in% params_est.]
+
+    # identify y variable name
+    y <- as.character(formula.[[2]])
+
+    # subset data to just be the x variable
+    dat <- data.[data.[,id_col.] == x[,id_col.],]
+    dat <- dat[! is.na(dat[,y]),]
+    x2 <- dat[,names(dat) %in% params_ind., drop = F]
+
+    # create a predictions data frame
+    predict_id <- data.frame(expand.grid(params_ind. = seq(min(x2, na.rm = T), max(x2, na.rm = T), length.out = 250), id_col = x[,id_col.]))
+    colnames(predict_id) <- c(params_ind., id_col.)
+
+    predict_id[, y] = eval(formula.[[3]], envir = c(est.param.val, predict_id[,params_ind., drop = F]))
+
+    return(predict_id)
+
+  }
+
+  if(length(params_ind) > 1){
+    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res)
+  }
+  else{
+
+    preds <- plyr::ldply(split(res_edit, id_edit), predict.nlsLoop)
+    preds <- preds[,c(3,2,4)]
+    preds[,1] <- as.character(preds[,1])
+
+    ### setting up a list return object
+    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res, predictions = preds)
+  }
+
+  class(val) <- 'nlsLoop'
+  return(val)
+
+}

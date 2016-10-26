@@ -2,6 +2,7 @@
 
 export(Topt)
 export(nlsLoop)
+export(nlsLoop2)
 export(nlsViewer)
 export(plot_all_nlsLoop)
 export(plot_id_nlsLoop)

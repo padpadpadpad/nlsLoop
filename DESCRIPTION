@@ -15,4 +15,5 @@ Imports: minpack.lm,
     stats,
     grDevices,
     shiny,
-    miniUI
+    miniUI,
+    nls2
