@@ -72,8 +72,6 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
 
   # create model ####
   formula <- stats::as.formula(model)
-
-  # define parameters to estimate and independent variable ####
   params_ind <- all.vars(formula[[3]])[all.vars(formula[[3]]) %in% colnames(data)]
   params_est <- all.vars(formula[[3]])[! all.vars(formula[[3]]) %in% colnames(data)]
 
