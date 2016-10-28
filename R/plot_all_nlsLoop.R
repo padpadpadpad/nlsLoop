@@ -64,10 +64,14 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col
       ggplot2::xlab(x) +
       ggplot2::theme_bw(base_family = 'Helvetica', base_size = 14) +
       ggplot2::ggtitle(id[i])
-
     print(plot)
   }
 
   grDevices::dev.off()
+
+  if("ggplot2" %in% (.packages())){
+    suppressMessages(suppressWarnings(detach("package:ggplot2", unload=TRUE)))
+    suppressMessages(suppressWarnings(library(ggplot2)))
+  }
 
 }
