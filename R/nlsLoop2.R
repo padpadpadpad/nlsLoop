@@ -114,22 +114,28 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
   # fit nls model using LM optimisation and using shotgun approach to get starting values ####
   for (i in 1:length(id)){
     fit <- NULL
-    # subset the dataframe to fit the model for each unique curve by id
+    fit.nls2 <- NULL
     data.fit <- data[data[,id_col] == id[i],]
+    data.fit2 <- data.fit[!is.na(data.fit[,as.character(formula[[2]])]) & !is.na(data.fit[,params_ind]),]
 
-    fit.nls2 <- tryCatch(nls2::nls2(formula, data = data.fit, start = params_bds, alg = alg, control = nls.control(maxiter = tries), na.action = na.omit), silent = TRUE)
+    if(nrow(data.fit2) >= length(params_est)){
+      try(fit.nls2 <- nls2::nls2(formula, data = data.fit2, start = params_bds, alg = alg, control = nls.control(maxiter = tries)), silent = T)
+    }
 
-    if(supp.errors == 'Y'){
-      try(fit <- minpack.lm::nlsLM(formula,
+    if(!is.null(fit.nls2)){
+
+      if(supp.errors == 'Y'){
+        try(fit <- minpack.lm::nlsLM(formula,
                                    start=coef(fit.nls2)[params_est],
                                    control = control,
                                    data=data.fit, ...),
           silent = TRUE)}
-    if(supp.errors != 'Y'){
-      try(fit <- minpack.lm::nlsLM(formula,
+      if(supp.errors != 'Y'){
+        try(fit <- minpack.lm::nlsLM(formula,
                                    start=coef(fit.nls2)[params_est],
                                    control = control,
                                    data=data.fit, ...))}
+    }
 
     # if it is the first fit of the model, output the results of the model in the dataframe
     # if the AIC score of the next fit model is < the AIC of the fit in the dataframe, replace
