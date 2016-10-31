@@ -48,7 +48,7 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col
   predict_data <- param_data$predictions
 
   id <- unique(raw_data[,id_col])
-
+  old <- ggplot2:::find_subclass("Geom","line")$default_aes
   ggplot2::update_geom_defaults("line", list(colour = 'red', linetype = 2))
 
   grDevices::pdf(file_name, ...)
@@ -69,9 +69,6 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col
 
   grDevices::dev.off()
 
-  if("ggplot2" %in% (.packages())){
-    suppressMessages(suppressWarnings(detach("package:ggplot2", unload=TRUE)))
-    suppressMessages(suppressWarnings(library(ggplot2)))
-  }
+  ggplot2::update_geom_defaults("line", old)
 
 }
