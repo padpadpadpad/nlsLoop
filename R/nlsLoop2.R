@@ -117,7 +117,7 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
     data.fit2 <- data.fit[!is.na(data.fit[,as.character(formula[[2]])]) & !is.na(data.fit[,params_ind]),]
 
     if(nrow(data.fit2) >= length(params_est)){
-      try(fit.nls2 <- nls2::nls2(formula, data = data.fit2, start = params_bds, alg = alg, control = nls.control(maxiter = tries)), silent = T)
+      try(fit.nls2 <- nls2::nls2(formula, data = data.fit2, start = params_bds, alg = alg, control = stats::nls.control(maxiter = tries)), silent = T)
     }
 
     if(!is.null(fit.nls2)){

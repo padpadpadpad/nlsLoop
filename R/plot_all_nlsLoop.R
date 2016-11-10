@@ -10,6 +10,7 @@
 #' @param col_point optional argument to control colour of points
 #' @param col_line optional argument to control colour of predictions
 #' @param group optional argument to ensure lines are grouped properly
+#' @param ... extra arguments to feed into \code{function(pdf)}
 #' @author Daniel Padfield
 #' @return a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
 #' @examples

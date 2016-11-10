@@ -21,6 +21,8 @@ plot_all_nlsLoop(file_name, raw_data, param_data, id_col = NULL,
 \item{col_line}{optional argument to control colour of predictions}
 
 \item{group}{optional argument to ensure lines are grouped properly}
+
+\item{...}{extra arguments to feed into \code{function(pdf)}}
 }
 \value{
 a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
