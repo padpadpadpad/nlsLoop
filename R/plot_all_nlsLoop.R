@@ -36,8 +36,7 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col
 
   # if statements if things are null
   if(is.null(id_col)){id_col <- as.character(param_data$info$id_col)}
-  if(is.null(col_line)){param_data$predictions$col_line <- 'red'}
-  if(is.null(col_point)){raw_data$col_point <- 'black'}
+  if(is.null(group) & is.null(col_line)){group <- 1}
   if(is.null(group)){group <- col_line}
 
 
@@ -49,27 +48,35 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col
   predict_data <- param_data$predictions
 
   id <- unique(raw_data[,id_col])
-  old <- ggplot2:::find_subclass("Geom","line")$default_aes
-  ggplot2::update_geom_defaults("line", list(colour = 'red', linetype = 2))
-
   grDevices::pdf(file_name, ...)
   for(i in 1:length(id)){
     plot <- ggplot2::ggplot() +
-      ggplot2::geom_line(ggplot2::aes_string(x = x, y = y,
-                                             col = col_line, group = group),
-                         predict_data[predict_data[,id_col] == id[i],], linetype = 2) +
-      ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col_point),
-                          shape = 21, fill = 'white', size = 2.75,
-                          raw_data[raw_data[,id_col] == id[i],]) +
       ggplot2::ylab(y) +
       ggplot2::xlab(x) +
       ggplot2::theme_bw(base_family = 'Helvetica', base_size = 14) +
       ggplot2::ggtitle(id[i])
+    if(!is.null(col_line)){
+      plot <- plot + ggplot2::geom_line(ggplot2::aes_string(x = x, y = y,
+                                             col = col_line, group = group),
+                         predict_data[predict_data[,id_col] == id[i],], linetype = 2)
+    }
+    if(!is.null(col_point)){
+      plot <- plot + ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col_point),
+                                         size = 2,
+                                         raw_data[raw_data[,id_col] == id[i],])
+    }
+    if(is.null(col_line)){
+      plot <- plot + ggplot2::geom_line(ggplot2::aes_string(x = x, y = y, group = group), col = 'red',
+                         predict_data[predict_data[,id_col] == id[i],], linetype = 2)
+    }
+    if(is.null(col_point)){
+      plot <- plot + ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), fill = 'white', size = 2,
+                                         raw_data[raw_data[,id_col] == id[i],])
+    }
+
     print(plot)
   }
 
   grDevices::dev.off()
-
-  ggplot2::update_geom_defaults("line", old)
 
 }
