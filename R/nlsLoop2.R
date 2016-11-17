@@ -202,7 +202,7 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
     preds[,1] <- as.character(preds[,1])
 
     ### setting up a list return object
-    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res, predictions = preds)
+    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]]), params_est = params_est), params = res, predictions = preds)
   }
 
   class(val) <- 'nlsLoop'

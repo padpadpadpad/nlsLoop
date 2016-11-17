@@ -35,7 +35,7 @@
 plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col_point = NULL, col_line = NULL, group = NULL, ...){
 
   # if statements if things are null
-  if(is.null(id_col)){id_col <- as.character(param_data$info$id_col)}
+  if(is.null(id_col)){id_col <- as.character(unique(param_data$info$id_col))}
   if(is.null(group) & is.null(col_line)){group <- 1}
   if(is.null(group)){group <- col_line}
 
