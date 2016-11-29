@@ -40,8 +40,8 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col
   if(is.null(group)){group <- col_line}
 
 
-  x <- as.character(param_data$info$params_ind)
-  y <- as.character(param_data$info$param_dep)
+  x <- as.character(unique(param_data$info$params_ind))
+  y <- as.character(unique(param_data$info$param_dep))
 
   if(!is.null(col_point)){raw_data <- raw_data[, c(x, y, id_col, col_point)]}
   if(is.null(col_point)){raw_data <- raw_data[, c(x, y, id_col)]}
@@ -52,28 +52,30 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col
   id <- unique(raw_data[,id_col])
   grDevices::pdf(file_name, ...)
   for(i in 1:length(id)){
+    temp_raw <- raw_data[raw_data[,id_col] == id[i],]
+    temp_pred <-  predict_data[predict_data[,id_col] == id[i],]
     plot <- ggplot2::ggplot() +
       ggplot2::ylab(y) +
       ggplot2::xlab(x) +
       ggplot2::theme_bw(base_family = 'Helvetica', base_size = 14) +
       ggplot2::ggtitle(id[i])
-    if(!is.null(col_line)){
+    if(!is.null(col_line) & nrow(temp_pred) > 0){
       plot <- plot + ggplot2::geom_line(ggplot2::aes_string(x = x, y = y,
                                              col = col_line, group = group),
-                         predict_data[predict_data[,id_col] == id[i],], linetype = 2)
+                         temp_pred, linetype = 2)
     }
-    if(!is.null(col_point)){
+    if(!is.null(col_point) & nrow(temp_raw) > 0){
       plot <- plot + ggplot2::geom_point(ggplot2::aes_string(x = x, y = y, col = col_point),
                                          size = 2,
-                                         raw_data[raw_data[,id_col] == id[i],])
+                                         temp_raw)
     }
-    if(is.null(col_line)){
+    if(is.null(col_line) & nrow(temp_pred) > 0){
       plot <- plot + ggplot2::geom_line(ggplot2::aes_string(x = x, y = y, group = group), col = 'red',
-                         predict_data[predict_data[,id_col] == id[i],], linetype = 2)
+                         temp_pred, linetype = 2)
     }
-    if(is.null(col_point)){
+    if(is.null(col_point) & nrow(temp_raw) > 0){
       plot <- plot + ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), fill = 'white', size = 2,
-                                         raw_data[raw_data[,id_col] == id[i],])
+                                        temp_raw)
     }
 
     print(plot)
