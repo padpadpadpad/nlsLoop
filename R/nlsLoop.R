@@ -212,7 +212,7 @@ nlsLoop <-
 
   # delete fits that simply have not worked
   # change quasi_r2 and AIC special odd values to NA
-  res[, 'quasi.r2'][which(is.nan(res[, 'quasi.r2']) | is.infinite(res[, 'quasi.r2']))] <- NA
+  if(r2 == 'Y'){res[, 'quasi.r2'][which(is.nan(res[, 'quasi.r2']) | is.infinite(res[, 'quasi.r2']))] <- NA}
   res[, 'AIC'][which(is.nan(res[, 'AIC']) | is.infinite(res[, 'AIC']))] <- NA
 
   # only create predictions for curves that have parameter values are different from 0
