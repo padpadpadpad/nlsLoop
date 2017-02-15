@@ -6,7 +6,7 @@
 possible fit.}
 \usage{
 nlsLoop(model, data, tries, id_col, param_bds, r2 = c("Y", "N"),
-  supp.errors = c("Y", "N"), AICc = c("Y", "N"), control, ...)
+  supp.errors = c("Y", "N"), AICc = c("Y", "N"), control, return_preds, ...)
 }
 \arguments{
 \item{model}{a non-linear model formula, with the response on the left of a ~ operatory and an expression involving parameters on the right.}
@@ -39,6 +39,8 @@ when sample size is small in comparison to the number of estimated
 parameters (Burnham & Anderson 2002 recommend its use when n / n.param < 40).}
 
 \item{control}{if specific control arguments are desired they can be specified using \code{\link[minpack.lm]{nls.lm.control}}.}
+
+\item{return_preds}{whether you want to return the predictions with the parameters or not. Defaults to yes. Add 'N' to change to no}
 
 \item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.}
 }
