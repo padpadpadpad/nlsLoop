@@ -24,6 +24,7 @@
 #' \code{'Y'}. Override this using \code{AICc == 'N'}. AICc should be used instead of AIC
 #' when sample size is small in comparison to the number of estimated
 #' parameters (Burnham & Anderson 2002 recommend its use when n / n.param < 40).
+#' @param return_preds whether you want to return the predictions with the parameters or not. Defaults to yes. Add 'N' to change to no
 #' @param control if specific control arguments are desired they can be specified using \code{\link[minpack.lm]{nls.lm.control}}.
 #' @param alg the algorithm with which to scan for start parameters. See \code{\link[nls2]{nls2}} for details. Defaults to \code{plinear-random}
 #' @param \dots extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.
@@ -56,13 +57,14 @@
 
 nlsLoop2 <-
   # arguments needed for nlsLoop ####
-function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = c('Y', 'N'), AICc = c('Y', 'N'), control, alg, ...){
+function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = c('Y', 'N'), AICc = c('Y', 'N'), return_preds, control, alg, ...){
 
   # set default values
   if(missing(r2)){r2 <- 'N'}
   if(missing(supp.errors)){supp.errors <- 'N'}
   if(missing(AICc)){AICc <- 'Y'}
   if(missing(alg)){alg <- 'plinear-random'}
+  if(missing(return_preds)){return_preds <- 'Y'}
 
   # checking whether MuMIn is installed
   if (!requireNamespace("MuMIn", quietly = TRUE)){
@@ -165,7 +167,12 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
   if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi.r2 for details.', call. = F)}
 
   # delete fits that simply have not worked
-  res_edit <- res[!(rowSums(res[,2:ncol(res)]) == 0),]
+  # change quasi_r2 and AIC special odd values to NA
+  res[, 'quasi.r2'][which(is.nan(res[, 'quasi.r2']) | is.infinite(res[, 'quasi.r2']))] <- NA
+  res[, 'AIC'][which(is.nan(res[, 'AIC']) | is.infinite(res[, 'AIC']))] <- NA
+
+  # only create predictions for curves that have parameter values are different from 0
+  res_edit <- res[!(rowSums(res[,2:(length(params_est)+1)] == 0) > 0),]
   id_edit <- unique(res_edit[,id_col])
 
   # creating a predict dataframe ####
@@ -192,18 +199,31 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
 
   }
 
-  if(length(params_ind) > 1){
-    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res)
+  # whether to return predictions
+  if(return_preds == 'Y'){
+
+    # cant do predictions for more than one independent variable
+    if(length(params_ind) > 1){
+
+      ### setting up a list return object
+      val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res)
+    }
+    else{
+
+      preds <- plyr::ldply(split(res_edit, id_edit), predict.nlsLoop)
+      preds <- preds[,c(3,2,4)]
+      preds[,1] <- as.character(preds[,1])
+
+      ### setting up a list return object
+      val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]]), params_est = params_est), params = res, predictions = preds)
+    }
   }
   else{
 
-    preds <- plyr::ldply(split(res_edit, id_edit), predict.nlsLoop)
-    preds <- preds[,c(3,2,4)]
-    preds[,1] <- as.character(preds[,1])
-
     ### setting up a list return object
-    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]]), params_est = params_est), params = res, predictions = preds)
+    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res)
   }
+
 
   class(val) <- 'nlsLoop'
   return(val)
