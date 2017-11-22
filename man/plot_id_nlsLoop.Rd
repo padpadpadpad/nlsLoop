@@ -36,4 +36,3 @@ plot_id_nlsLoop(raw_data = Chlorella_TRC_test, param_data = fits, id = '1')
 \author{
 Daniel Padfield
 }
-

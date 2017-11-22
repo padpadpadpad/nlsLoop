@@ -54,4 +54,3 @@ plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', raw_data = Chlorella_TRC_test, p
 \author{
 Daniel Padfield
 }
-

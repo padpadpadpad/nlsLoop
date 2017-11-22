@@ -34,4 +34,3 @@ ggplot(Chlorella_TRC) +
 Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton, Ecology Letters, 19, 133-142.
 }
 \keyword{dataset}
-

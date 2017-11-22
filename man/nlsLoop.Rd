@@ -72,9 +72,6 @@ fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
                 lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
 
 }
-\author{
-Daniel Padfield
-}
 \seealso{
 \code{\link[nlsLoop]{quasi.rsq.nls}} for details on the calculation of r squared values for non linear models.
 
@@ -82,4 +79,6 @@ Daniel Padfield
 
 \code{\link[MuMIn]{AICc}} for application of AICc.
 }
-
+\author{
+Daniel Padfield
+}

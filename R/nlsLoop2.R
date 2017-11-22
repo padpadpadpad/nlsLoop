@@ -126,13 +126,13 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
 
       if(supp.errors == 'Y'){
         try(fit <- minpack.lm::nlsLM(formula,
-                                   start=coef(fit.nls2)[params_est],
+                                   start=stats::coef(fit.nls2)[params_est],
                                    control = control,
                                    data=data.fit, ...),
           silent = TRUE)}
       if(supp.errors != 'Y'){
         try(fit <- minpack.lm::nlsLM(formula,
-                                   start=coef(fit.nls2)[params_est],
+                                   start=stats::coef(fit.nls2)[params_est],
                                    control = control,
                                    data=data.fit, ...))}
     }

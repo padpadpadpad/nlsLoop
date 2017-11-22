@@ -30,4 +30,3 @@ Topt(4, 315, 0.6)
 \author{
 Daniel Padfield
 }
-

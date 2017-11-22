@@ -30,13 +30,12 @@ temp <- seq(273.15, 333.15, 1)
 plot(schoolfield.high(ln.c = -1, Ea = 0.6, Eh = 2, Th = 320, temp = temp, Tc = 20))
 
 }
-\author{
-Daniel Padfield
-}
 \references{
 Schoolfield, R. M., Sharpe, P. J. & Magnuson, C. E. Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theor. Biol. 88, 719-731 (1981)
 }
 \seealso{
 a Shiny app showing how the parameters of the schoolfield high and full schoolfield model incorporating low temperature inactivation control the shape of the curve is available online \href{https://padpadpadpad.shinyapps.io/Sharpe-Schoolfield/}{here}
 }
-
+\author{
+Daniel Padfield
+}

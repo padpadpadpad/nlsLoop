@@ -47,9 +47,6 @@ quasi.rsq.nls(fit, Chlorella_TRC[Chlorella_TRC$curve_id == 1,]$ln.rate, 4)
 
 0.4608054
 }
-\author{
-Daniel Padfield
-}
 \references{
 Spiess, A.-N. & Neumeyer, N. (2010) An evaluation of R2 as an
 inadequate measure for nonlinear models in pharmacological and biochemical
@@ -57,4 +54,6 @@ research: a Monte Carlo approach. BMC pharmacology, 10, 6.
 
 \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{A StackOverflow discussion}
 }
-
+\author{
+Daniel Padfield
+}

@@ -3,7 +3,7 @@
 nlsLoop
 -------
 
-Tools expanding the non-linear regression method nls and nlsList from nlme.
+Tools for expanding the non-linear regression method nls and nlsList from nlme.
 
 ### Issues and suggestions
 
@@ -13,13 +13,13 @@ Mac: [![Build Status](https://travis-ci.org/padpadpadpad/nlsLoop.svg?branch=mast
 
 ### Overview
 
-The mainstay of this package is `nlsLoop::nlsLoop()`. If you have a dataset where you want to fit the same model over many levels of a factor, you may use `nlme::nlsList()`. However, `nlsList()` only allows for one set of starting values so its likely not all of the models will converge.
+The mainstay of this package is `nlsLoop::nlsLoop()`. If you have a dataset where you want to fit the same model over many levels of a factor, you may use `nlme::nlsList()`. However, `nlsList()` only allows for one set of starting values so it is possible that not all of the models will converge if the shape of the data, and thus likely parameter values, are very different.
 
-`nlsLoop()` allows for a range of starting values and tries unlimited different starting values to the fit at each level of the factor, picking the best fit for each model using AIC scores.
+`nlsLoop()` allows for a range of starting values and tries unlimited different starting values to the fit at each level of the factor, picking the best fit for each model using AIC scores. The best model
 
 ### Tutorial
 
-A more in-depth tutorial and explanation of parameters in `nlsLoop()` can be found on my [blog](http://padpadpadpad.github.io/2016-09-08-nlsLoop/)
+A more in-depth tutorial and explanation of parameters in `nlsLoop()` can be found as a [blog post](https://padpadpadpad.github.io/post/introducing-nlsloop/) or as a vignette of the package.
 
 ### Installation and examples
 
@@ -28,6 +28,8 @@ A more in-depth tutorial and explanation of parameters in `nlsLoop()` can be fou
 ``` r
 # install package
 devtools::install_github("padpadpadpad/nlsLoop")
+#> Warning in strptime(x, fmt, tz = "GMT"): unknown timezone 'zone/tz/2017c.
+#> 1.0/zoneinfo/Europe/London'
 
 # load in nlsLoop
 library(nlsLoop)
@@ -70,11 +72,13 @@ head(fits$params)
 ``` r
 # plot a single curve
 plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
+#> Warning: Removed 750 rows containing missing values (geom_path).
+#> Warning: Removed 36 rows containing missing values (geom_point).
 ```
 
 ![](README-first%20fit%20plot-1.png)
 
-#### 5. Check fit of all curves (Creates a pdf)
+#### 5. Check fit of all curves (creates a pdf)
 
 ``` r
 # create pdf of each curve
