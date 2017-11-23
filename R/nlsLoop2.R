@@ -15,7 +15,7 @@
 #' param 2 etc)
 #' @param r2 whether or not you want the quasi rsquared value to be returned.
 #' This defaults to no, to include the r2 values use \code{r2 = 'Y'}.
-#' @param supp.errors if \code{supp.errors = 'Y'}, then no error messages will be shown
+#' @param supp_errors if \code{supp_errors = 'Y'}, then no error messages will be shown
 #' from the actual nlsLM function, reducing the number of error messages
 #' received while the model works through starting parameters from which the
 #' model cannot converge. Advised to only be used once it is expected that
@@ -33,7 +33,7 @@
 #' \code{lower/upper = c()} where these represent upper and lower boundaries for
 #' parameter estimates
 #' @author Daniel Padfield
-#' @seealso \code{\link[nlsLoop]{quasi.rsq.nls}} for details on the calculation of r squared values for non linear models.
+#' @seealso \code{\link[nlsLoop]{quasi_rsq_nls}} for details on the calculation of r squared values for non linear models.
 #'
 #' \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
 #'
@@ -46,22 +46,31 @@
 #'
 #' # run nlsLoop()
 #'
-#' fits <- nlsLoop2(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+#'# define the Sharpe-Schoolfield equation
+#' schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
+#'  Tc <- 273.15 + Tc
+#'  k <- 8.62e-5
+#'  boltzmann.term <- lnc + log(exp(E/k*(1/Tc - 1/temp)))
+#'  inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
+#'  return(boltzmann.term + inactivation.term)
+#'}
+#'
+#' fits <- nlsLoop2(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
 #'                 data = Chlorella_TRC_test,
 #'                 tries = 500,
 #'                 id_col = 'curve_id',
 #'                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
-#'                 lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
+#'                 lower = c(lnc=-10, E=0, Eh=0, Th=0))
 #'
 #' @export
 
 nlsLoop2 <-
   # arguments needed for nlsLoop ####
-function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = c('Y', 'N'), AICc = c('Y', 'N'), return_preds, control, alg, ...){
+function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp_errors = c('Y', 'N'), AICc = c('Y', 'N'), return_preds, control, alg, ...){
 
   # set default values
   if(missing(r2)){r2 <- 'N'}
-  if(missing(supp.errors)){supp.errors <- 'N'}
+  if(missing(supp_errors)){supp_errors <- 'N'}
   if(missing(AICc)){AICc <- 'Y'}
   if(missing(alg)){alg <- 'plinear-random'}
   if(missing(return_preds)){return_preds <- 'Y'}
@@ -109,7 +118,7 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
   res[,2:(ncol(params_bds) + 1)] <- 0
   colnames(res) <- c(id_col, colnames(params_bds))
   res$AIC <- 0
-  res$quasi.r2 <- 0
+  res$quasi_r2 <- 0
 
   # fit nls model using LM optimisation and using shotgun approach to get starting values ####
   for (i in 1:length(id)){
@@ -124,13 +133,13 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
 
     if(!is.null(fit.nls2)){
 
-      if(supp.errors == 'Y'){
+      if(supp_errors == 'Y'){
         try(fit <- minpack.lm::nlsLM(formula,
                                    start=stats::coef(fit.nls2)[params_est],
                                    control = control,
                                    data=data.fit, ...),
           silent = TRUE)}
-      if(supp.errors != 'Y'){
+      if(supp_errors != 'Y'){
         try(fit <- minpack.lm::nlsLM(formula,
                                    start=stats::coef(fit.nls2)[params_est],
                                    control = control,
@@ -142,7 +151,7 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
     if(AICc == 'N'){
       if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > stats::AIC(fit)){
         res[i, 'AIC'] <- stats::AIC(fit)
-        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsLoop::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        if(r2 == 'Y') {res[i, 'quasi_r2'] <- nlsLoop::quasi_rsq_nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
           res[i, params_est[k]] <- as.numeric(stats::coef(fit)[k])
         }
@@ -154,7 +163,7 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
       if(!is.null(fit) && res[i, 'AIC'] == 0 | !is.null(fit) && res[i, 'AIC'] > MuMIn::AICc(fit)){
 
         res[i, 'AIC'] <- MuMIn::AICc(fit)
-        if(r2 == 'Y') {res[i, 'quasi.r2'] <- nlsLoop::quasi.rsq.nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
+        if(r2 == 'Y') {res[i, 'quasi_r2'] <- nlsLoop::quasi_rsq_nls(mdl = fit, y = data.fit[colnames(data.fit) == formula[[2]]], param = length(params_est))}
         for(k in 1:length(params_est)){
           res[i, params_est[k]] <- as.numeric(stats::coef(fit)[k])
         }
@@ -162,13 +171,13 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp.errors = 
     }
   }
   # warnings for res ####
-  if(r2 == 'N') {res <- res[,-grep('quasi.r2', colnames(res))]}
-  if(supp.errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
-  if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi.r2 for details.', call. = F)}
+  if(r2 == 'N') {res <- res[,-grep('quasi_r2', colnames(res))]}
+  if(supp_errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
+  if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi_r2 for details.', call. = F)}
 
   # delete fits that simply have not worked
   # change quasi_r2 and AIC special odd values to NA
-  if(r2 == 'Y'){res[, 'quasi.r2'][which(is.nan(res[, 'quasi.r2']) | is.infinite(res[, 'quasi.r2']))] <- NA}
+  if(r2 == 'Y'){res[, 'quasi_r2'][which(is.nan(res[, 'quasi_r2']) | is.infinite(res[, 'quasi_r2']))] <- NA}
   res[, 'AIC'][which(is.nan(res[, 'AIC']) | is.infinite(res[, 'AIC']))] <- NA
 
   # only create predictions for curves that have parameter values are different from 0

@@ -16,5 +16,6 @@ Imports: minpack.lm,
     grDevices,
     nls2
 Suggests: knitr,
-    rmarkdown
+    rmarkdown,
+    tidyr
 VignetteBuilder: knitr

@@ -8,15 +8,28 @@
 #' @author Daniel Padfield
 #' @return a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
 #' @examples
+#' # load in data
+#'
 #' data("Chlorella_TRC")
 #' Chlorella_TRC_test <- Chlorella_TRC[Chlorella_TRC$curve_id %in% c(1:10),]
 #'
-#' fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+#' # run nlsLoop()
+#'
+#'# define the Sharpe-Schoolfield equation
+#' schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
+#'  Tc <- 273.15 + Tc
+#'  k <- 8.62e-5
+#'  boltzmann.term <- lnc + log(exp(E/k*(1/Tc - 1/temp)))
+#'  inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
+#'  return(boltzmann.term + inactivation.term)
+#'}
+#'
+#' fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
 #'                 data = Chlorella_TRC_test,
 #'                 tries = 500,
 #'                 id_col = 'curve_id',
 #'                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
-#'                 lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
+#'                 lower = c(lnc=-10, E=0, Eh=0, Th=0))
 #'
 #' plot_id_nlsLoop(raw_data = Chlorella_TRC_test, param_data = fits, id = '1')
 #'

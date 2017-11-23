@@ -6,7 +6,7 @@
 possible fit}
 \usage{
 nlsLoop2(model, data, id_col, tries, param_bds, r2 = c("Y", "N"),
-  supp.errors = c("Y", "N"), AICc = c("Y", "N"), return_preds, control, alg,
+  supp_errors = c("Y", "N"), AICc = c("Y", "N"), return_preds, control, alg,
   ...)
 }
 \arguments{
@@ -27,7 +27,7 @@ param 2 etc)}
 \item{r2}{whether or not you want the quasi rsquared value to be returned.
 This defaults to no, to include the r2 values use \code{r2 = 'Y'}.}
 
-\item{supp.errors}{if \code{supp.errors = 'Y'}, then no error messages will be shown
+\item{supp_errors}{if \code{supp_errors = 'Y'}, then no error messages will be shown
 from the actual nlsLM function, reducing the number of error messages
 received while the model works through starting parameters from which the
 model cannot converge. Advised to only be used once it is expected that
@@ -66,16 +66,25 @@ Chlorella_TRC_test <- Chlorella_TRC[Chlorella_TRC$curve_id \%in\% c(1:10),]
 
 # run nlsLoop()
 
-fits <- nlsLoop2(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+# define the Sharpe-Schoolfield equation
+schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
+ Tc <- 273.15 + Tc
+ k <- 8.62e-5
+ boltzmann.term <- lnc + log(exp(E/k*(1/Tc - 1/temp)))
+ inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
+ return(boltzmann.term + inactivation.term)
+}
+
+fits <- nlsLoop2(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                 data = Chlorella_TRC_test,
                 tries = 500,
                 id_col = 'curve_id',
                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
-                lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
+                lower = c(lnc=-10, E=0, Eh=0, Th=0))
 
 }
 \seealso{
-\code{\link[nlsLoop]{quasi.rsq.nls}} for details on the calculation of r squared values for non linear models.
+\code{\link[nlsLoop]{quasi_rsq_nls}} for details on the calculation of r squared values for non linear models.
 
 \code{\link[minpack.lm]{nlsLM}} for details on additional arguments to pass to the nlsLM function.
 

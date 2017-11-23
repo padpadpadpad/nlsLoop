@@ -23,195 +23,127 @@ I will demonstrate how the model can be fitted with the Sharpe-Schoolfield model
 
 A detailed explanation of the model can be found here (Padfield _et. al_ 2016). So we can load the data in and then write a function to run the model.
 
+We begin with loading in the data, which comes with the package. 
 
+```{r load_in data, tidy=TRUE}
+# load in package
+library(nlsLoop)
 
-The data we shall use for this tutorial are a bunch of thermal performance curves showing the relationship between metabolic rates and temperature in the aquatic alga, _Chlorella vulgaris_<sup>[2]</sup>.
-
-So enough talking, lets load in the data and have an initial look at the data.
-
-```{r load in data and look, tidy=TRUE}
+# load in data
 data('Chlorella_TRC')
 
-head(Chlorella_TRC)
+# look at column names
+names(Chlorella_TRC)
 ```
 
-As you can see, and read about in the [paper](http://onlinelibrary.wiley.com/doi/10.1111/ele.12545/full) (__YES, THIS IS A PLUG__), we have rates of metabolism for both photosynthesis and respiration across 5 different growth temperatures after both 10 (acclimation) and 100 (adaptation) generations of growth, so we can have a go at an initial plot accordingly...
+We then need to specify the non-linear model we shall fit to the data
 
-```{r first plot, fig.width=12, fig.height=9}
-ggplot(Chlorella_TRC) +
-  geom_point(aes(temp, ln.rate, col = growth.temp), shape = 21, size = 2, alpha = 0.5) +
-  facet_wrap(~flux + process, labeller = labeller(.multi_line = F)) +
-  scale_colour_gradient(low = 'blue', high = 'red', 'Growth Temperature') +
-  theme_bw(base_size = 16, base_family = 'Helvetica') +
-  ylab('log Metabolic rate') +
-  xlab('Assay temperature (ºC)')
+```{r schoolfield_high, tidy = TRUE}
+# define the Sharpe-Schoolfield equation
+schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
+  Tc <- 273.15 + Tc
+  k <- 8.62e-5
+  boltzmann.term <- lnc + log(exp(E/k*(1/Tc - 1/temp)))
+  inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
+  return(boltzmann.term + inactivation.term)
+  }
 ```
 
-The data follows a classic unimodal thermal performance curve and can be modelled using a modified version of the Sharpe-Schoolfield model<sup>[3]</sup>. A function characterising the model is provided in the package as `schoolfield.high()`. This is more about the fitting of non-linear curves than the model so that's as in depth as I will go here!
+We can then run __nlsLoop__, as long as we have a column in the dataframe that identifies each level of the factor. This column, __id_col__, can be either a __character__ or a __factor__. It is going to be very useful that this column contains information about the data, possible the treatments, separated by '_'. The __id_col__ is what allows you to link your raw data with your parameters and your predictions at a later date, so being able to split this column back up into treatment columns is often a great option.
 
-The data has 60 separate curves and `id_col = curve_id`. So lets fit the model!
-
-#### 3. Run nlsLoop
-
-`nlsLoop::nlsLoop()` uses `minpack.lm::nlsLM()` to fit each individual curve allows addiitional arguments such as `lower` and `na.action` accordingly. The best fit for each factor level is determined using AIC scores and if the best fit does not change for 100 "tries" then it will move onto the next level of the factor.
+It can still be advisable to run a single __nls()__ fit on the entire dataset in an attempt to give your parameter values some ball park boundaries. If you do not then you may suffer the same problems with __nlsLoop__ as are experienced with __nlsList__.
 
 ```{r nlsLoop, message=FALSE, warning=FALSE, results='hide'}
-fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
+fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = Chlorella_TRC,
                      tries = 500,
                      id_col = 'curve_id',
                      param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
                      r2 = 'Y',
-                     supp.errors = 'Y',
+                     supp_errors = 'Y',
                      AICc = 'Y',
                      na.action = na.omit,
-                     lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
-
+                     lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
 ```
 
-__WARNING: This may take quite a while depending on how good your parameter boundaries are!__
+The documentation for __nlsLoop__ can be found by using `?nlsLoop`. The argument `param_bds` sets upper and lower limits for each parameter from which random values between these are picked. The list of values goes through the lower and upper boundary for each parameter in turn (i.e. $lnc_{lower}$, $lnc_{lower}$, $E_{lower}$, $E_{upper}$ ...).
 
-The result of this returns an `nlsLoop` object that is made up of `params` which has all of our parameter values for each individual fit and `predictions` which is a high resolution predicted dataframe to allow for a smooth curve on a plot (which we will come to later).
+When running, the code gives messages of progress of how far through the number of curve fits the code is, and prints the number of curve fits (every ten) that a single curve fit is through. If the AIC score does not get lower for 100 different fits to the data (using different parameter values) __nlsLoop__ moves onto the next curve fit.
 
-These can be accessed simply using `fits$params` or `fits$predictions`.
+__nlsLoop__ returns an `nlsLoop` object that works the same way as a list. It is made up of:
+    - __formula__ the formula used in the fit
+    - __info__ some information on the dependent and independent parameters. These are used in the plotting functions __plot_all_nlsLoop__ and __plot_id_nlsLoop__
+    - __params__ which has all of our parameter values for each individual fit
+    - __predictions__ which is a dataframe of the predicted fits of each curve, from each individual fits minimum and maximum predictor values. This is given in stacked, tidy format, ready for incorporation with ggplot2
 
-```{r}
+```{r, look_at_fits}
+# look at parameter values
+head(fits$params)
+
+# look at fits
 head(fits$params)
 ```
 
-Having all of these in a single `nlsLoop` object allows a simple plotting method to assess how good our fits to the data are.  One of the best ways to assess non-linear model is by __ACTUALLY LOOKING__ at how well every model fits its respective raw data.
+Having all of the elements in a single __nlsLoop__ object allows a simple plotting method to assess how good our fits to the data are.  Although AIC scores pick the best model, this is relative to all the other fits and does not tell us anything about how well the model fits the data. The package does include a way to calculate a quasi-rsquared score, but use this at your own risk. Non-linear versions of rsquared do not necessarily mean the same thing as linear rsquared values do (Spiess & Neumeyer 2010). Another way of evaluating model fit is by plotting the predictions alongside the raw data.
 
-#### 4. Plotting
+__nlsLoop__ provides an easy wrapper to ggplot2 to do this. Firstly lets have a look at a single level of `curve_id`, a function called __plot_id_nlsLoop__ allows this.
 
-Firstly lets have a look at a single level of `curve_id`, a function called `plot_id_nlsLoop()` allows this.
-
-```{r first fit plot, fig.height=6, fig.width=8}
+```{r first_fit_plot, fig.height=6, fig.width=8}
 plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
 ```
 
-Not a bad fit... Further to this, `plot_all_nlsLoop()` will produce a pdf with each plot on a new sheet.
+Further to this, __plot_all_nlsLoop__ will produce a pdf with each plot on a new sheet.
 
-```{r pdf fits, eval=FALSE}
+```{r pdf_fits, eval=FALSE}
 plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_TRC, param_data = fits)
 ```
 
-#### 5. Exploratory analysis
+Instead of using the plotting functions within the package, we can easily create plots using ggplot and the predictions dataframe. For example, we can plot all the curve fits split by growth temperature and acclimation _vs._ adaptation
 
-We can now edit some of the dataframes to look at the curves split by the treatments within the dataset and explore how the parameter values change across the treatments.
+```{r data wrangling, fig.width=12, fig.height=9}
+# get distinct values of process, flux and growth.temp for each value of curve_id
+d_treatment <- Chlorella_TRC[,c('curve_id','process', 'growth.temp', 'flux')]
+d_treatment <- d_treatment[!duplicated(d_treatment),]
 
-For example we can plot all the curves split by respiration, photosynthesis and acclimatory or adaptive timescales.
-
-```{r data wrangling, fig.width=12, fig.height=9, eval = FALSE}
-
-# select treatment columns from original dataset
-treatments <- select(Chlorella_TRC, c(curve_id, process, growth.temp, flux))
-# keep unique combinations of treatments
-treatments <- unique(treatments[,colnames(treatments)])
-
-# bind treatments to predictions and parameter dataframe
-fits$params <- merge(fits$params, treatments, by = 'curve_id')
-fits$predictions <- merge(fits$predictions, treatments, by = 'curve_id')
+# merge with predictions by curve_id
+fits$predictions <- merge(fits$predictions, d_treatment, by = 'curve_id')
 
 # plot every curve
+library(ggplot2)
 ggplot() +
-  geom_point(aes(K, ln.rate, col = growth.temp), shape = 21, size = 2, alpha = 0.25, Chlorella_TRC) +
-  geom_line(aes(K, ln.rate, col = growth.temp, group = curve_id), linetype = 2, alpha = 0.5, fits$predictions) +
-  facet_wrap(~flux + process, labeller = labeller(.multi_line = F)) +
-  scale_colour_gradient(low = 'blue', high = 'red', 'Growth Temperature') +
+  geom_point(aes(K, ln.rate, col = flux), size = 2, Chlorella_TRC) +
+  geom_line(aes(K, ln.rate, col = flux, group = curve_id), alpha = 0.5, fits$predictions) +
+  facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = F)) +
+  scale_colour_manual(values = c('green4', 'black')) +
   theme_bw(base_size = 16, base_family = 'Helvetica') +
   ylab('log Metabolic rate') +
   xlab('Assay temperature (ºC)')
 
 ```
 
-We can also start having a quick look at any differences between parameters...
+We can also start having a quick look at any differences between parameters. Here we will plot them pooled between fluxes.
 
-```{r parameter plots, fig.height=8, fig.width=10, eval = FALSE}
+```{r parameter_plots, fig.height=8, fig.width=10}
+# merge params with d_treatment by curve_id
+fits$params <- merge(fits$params, d_treatment, by = 'curve_id')
 
-gather(fits$params, 'parameter', 'value', c(ln.c, Ea, Eh, Th)) %>%
-  ggplot(.) +
-  geom_point(aes(growth.temp, value, col = flux, shape = process), fill = 'white', size = 2, position = position_dodge(width = 0.25)) +
+library(tidyr)
+
+gather(fits$params, 'parameter', 'value', c(lnc, E, Eh, Th)) %>%
+  ggplot(., aes(flux, value, col = flux)) +
+  geom_boxplot(fill = 'white', outlier.shape = NA) +
+  geom_point(position = position_jitter(height = 0, width = 0.1)) +
   facet_wrap(~ parameter, scales = 'free_y') +
   scale_color_manual(values = c('green4', 'black')) +
   scale_shape_manual(values = c(21, 24)) +
   theme_bw(base_size = 16, base_family = 'Helvetica')
-  
-
 ```
 
-From here we can see that the activation energy (_E~a~_) in the model does not change systematically with growth temperature or whether it has acclimated or adapted to the growth temperature. However a body of work has shown that photosynthesis should be less sensitive to temperature change (a lower _E~a~_) than that of respiration.
+When you are happy with your starting parameter values, __nlsLoop2__ can be used to speed up your model fitting.
 
-```{r Ea plots, fig.height=6, fig.width=8, eval = FALSE}
-ggplot(fits$params, aes(flux, Ea)) +
-  geom_boxplot(aes(fill = flux, col = flux), outlier.shape = NA, width = 0.5) +
-  stat_summary(geom = 'crossbar', fatten = 0, color = 'white', width = 0.5, fun.data = function(x){ return(c(y=median(x), ymin=median(x), ymax=median(x)))}) +
-  geom_jitter(aes(flux, Ea, col = flux), shape = 21, fill ='white', width = 0.25, height = 0) +
-  theme_bw(base_size = 16, base_family = 'Helvetica') +
-  scale_color_manual(values = c('green4', 'black')) +
-  scale_fill_manual(values = c('green4', 'black')) +
-  ylab('Activation enrrgy (eV)') +
-  xlab('Flux')
-  
-
-```
-
-And as we can see it looks like we have a difference in the activation energies, with photosynthesis having a lower activation energy than respiration.
-
-So from there we can start exploring our data and formally analysing our parameters! `nlsLoop` allows us to have confidence in our fitting of all the curves and gives us an easy way of plotting and manipulating the data afterwards! 
-
-Happy model fitting. Any comments much appreciated.
+__nlsLoop__ provides a more reliable and reproducible way of getting individual non-linear fits over levels of a factor of a dataframe. I hope this vignette has provided a good overview of its benefits and usage.
 
 ### References:
-[1] Spiess, A.N. & Neumeyer, N. (2010). An evaluation of R<sup>2</sup> as an inadequate measure for nonlinear models in pharmacological and biochemical research: a Monte Carlo approach. BMC Pharmacology, 10, 6.
-
-[2] Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19(2), 133-142.
-
-[3] Schoolfield, R.M., Sharpe, P.J. & Magnuson, C.E. (1981). Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theoretical Biology, 88, 719–31.
-
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+    - Spiess, A.N. & Neumeyer, N. (2010). An evaluation of R<sup>2</sup> as an inadequate measure for nonlinear models in pharmacological and biochemical research: a Monte Carlo approach. BMC Pharmacology, 10, 6.
+    - Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19(2), 133-142.
+    - Schoolfield, R.M., Sharpe, P.J. & Magnuson, C.E. (1981). Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theoretical Biology, 88, 719–31.

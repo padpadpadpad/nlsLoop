@@ -36,50 +36,60 @@ A more in-depth tutorial and explanation of parameters in `nlsLoop()` can be fou
 
 #### 1. Installation
 
-```{r install, message=FALSE}
+```{r install, message=FALSE, eval = FALSE}
 # install package
 devtools::install_github("padpadpadpad/nlsLoop")
-
-# load in nlsLoop
-library(nlsLoop)
 
 ```
 
 #### 2. Run nlsLoop()
 
-```{r run nlsLoop, message=FALSE, warning=FALSE, results='hide'}
+```{r run_nlsLoop, message=FALSE, warning=FALSE, results='hide'}
+
+# load in nlsLoop
+library(nlsLoop)
+
 # load in example data set
 data("Chlorella_TRC")
 
+# define the Sharpe-Schoolfield equation
+schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
+  Tc <- 273.15 + Tc
+  k <- 8.62e-5
+  boltzmann.term <- lnc + log(exp(E/k*(1/Tc - 1/temp)))
+  inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
+  return(boltzmann.term + inactivation.term)
+  }
+
 # run nlsLoop
-fits <- nlsLoop(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
-                data = Chlorella_TRC,
-                tries = 500,
-                id_col = 'curve_id',
-                param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
-                r2 = 'Y',
-                supp.errors = 'Y',
-                AICc = 'Y',
-                na.action = na.omit,
-                lower = c(ln.c=-10, Ea=0, Eh=0, Th=0))
+fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                     data = Chlorella_TRC,
+                     tries = 500,
+                     id_col = 'curve_id',
+                     param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                     r2 = 'Y',
+                     supp_errors = 'Y',
+                     AICc = 'Y',
+                     na.action = na.omit,
+                     lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
 ```
 
 #### 3. Check output
 
-```{r look at data}
+```{r look_at_data}
 head(fits$params)
 ```
 
 #### 4. Check fit of single curve
 
-```{r first fit plot, fig.height=6, fig.width=8}
+```{r first_fit_plot, fig.height=6, fig.width=8}
 # plot a single curve
 plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
 ```
 
 #### 5. Check fit of all curves (creates a pdf)
 
-```{r pdf fits, eval=FALSE}
+```{r pdf_fits, eval=FALSE}
 # create pdf of each curve
 plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_TRC, param_data = fits)
 ```

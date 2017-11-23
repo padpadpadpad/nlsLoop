@@ -30,15 +30,25 @@
 #' \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{A StackOverflow discussion}
 #' @examples
 #' data(Chlorella_TRC)
-#' fit <- minpack.lm::nlsLM(ln.rate ~ schoolfield.high(ln.c, Ea, Eh, Th, temp = K, Tc = 20),
-#'                 data = Chlorella_TRC[Chlorella_TRC$curve_id == 1,],
-#'                 start = c(ln.c = -1.2, Ea = 0.95, Eh = 5, Th = 315))
 #'
-#' quasi.rsq.nls(fit, Chlorella_TRC[Chlorella_TRC$curve_id == 1,]$ln.rate, 4)
+#' # define the Sharpe-Schoolfield equation
+#' schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
+#'  Tc <- 273.15 + Tc
+#'  k <- 8.62e-5
+#'  boltzmann.term <- lnc + log(exp(E/k*(1/Tc - 1/temp)))
+#'  inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
+#'  return(boltzmann.term + inactivation.term)
+#'}
+#'
+#' fit <- minpack.lm::nlsLM(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+#'                 data = Chlorella_TRC[Chlorella_TRC$curve_id == 1,],
+#'                 start = c(lnc = -1.2, E = 0.95, Eh = 5, Th = 315))
+#'
+#' quasi_rsq_nls(fit, Chlorella_TRC[Chlorella_TRC$curve_id == 1,]$ln.rate, 4)
 #'
 #' 0.4608054
 #' @export
-quasi.rsq.nls <- function(mdl, y, param){
+quasi_rsq_nls <- function(mdl, y, param){
   adj <- (sum(!is.na(y)) - 1)/(sum(!is.na(y)) - param)
   sum.sq <- (sum(!is.na(y)) - 1)*stats::var(y, na.rm = TRUE)
   rsq <- 1 - (stats::deviance(mdl)/sum.sq)
