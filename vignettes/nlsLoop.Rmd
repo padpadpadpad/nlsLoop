@@ -9,48 +9,21 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-__nlsLoop__ is a simple R package that gives a more reproducible and reliable method for fitting individual non-linear regression fits over levels of a factor within a data frame. This procedure is commonly done using __nlme::nlsList__, but this function can only use one set of parameter values. Consequently, some levels of tha factor fail to converge on the correct parameter value simply because of the starting values. __nlsLoop__ allows multiple starting values for each parameter, therefore allowing for more parameter space to be explored when model fitting. The best model is chosen based on AIC score.
+__nlsLoop__ is a simple R package that gives a more reproducible and reliable method for fitting individual non-linear regression fits over levels of a factor within a data frame. This procedure is commonly done using __nlme::nlsList__, but this function can only use one set of parameter values. Consequently, some levels of the factor fail to converge on the correct parameter value simply because of the starting values. __nlsLoop__ allows multiple starting values for each parameter, therefore allowing for more parameter space to be explored when model fitting. The best model is chosen based on AIC score.
 
-This document provides an introduction into the one key use of __nlsLoop__ 
+This document provides an introduction into this one key use of __nlsLoop__, and also demonstrates its potential for producing predictions around each fit and exploratory plotting.
 
-So you have data you want to fit to a non-linear model...
+## An example non-linear model fit
 
-This blog post assumes you have a non-linear model formulation you want to fit to non-linear data and are aware of the excellent `nlme` package by Pinheiro and Bates and their [book](Mixed-Effects Models in S and S-PLUS (Statistics and Computing)) that nicely explains how to use it. This would be my first port of call if you want to understand the simplicities and complexities of fitting non-linear models and mixed effect models in general.
+This vignette will use data from a dataset of thermal response curves for photosynthesis and respiration of the aquatic phytoplankton _Chlorella vulgaris_ (Padfield _et. al_ 2016). This data represents the rate of photosynthesis and respiration at different short-term, assay temperatures (16 ºC to 46 ºC) and was done in triplicate at 5 growth temperatures (20  ºC, 23 ºC, 27 ºC, 30 ºC and 33 ºC) after both 10 (acclimation) and 100 (adaptation) generations of growth.
 
-This blog post is less about when to use non-linear regression or non-linear mixed effects models but more about a method of ensuring the __best fit each curve__ to its data.
+This gives 60 curves in total. These responses generally follow a unimodal response and there are various models that have been used to fit to the data. A very recent overview of these can be found [here](http://onlinelibrary.wiley.com/doi/10.1002/ece3.3576/epdf) and the authors also released an R package which contains many of these [models](https://cran.r-project.org/web/packages/temperatureresponse/index.html) (Low-Decarie _et al._ 2017).
 
-When fitting non-linear models to data, it is common to want to fit the same model to multiple levels of a factor. In this situation `nlme::nlsList()` is often used to loop through levels of factor such as `nlsList(Y ~ function(X)|factor)`. However, `nlsList()` only allows a single set of starting parameters. 
+I will demonstrate how the model can be fitted with the Sharpe-Schoolfield model of the form:
 
-If you have a dataset where every level of the factor fits the same model, but spans several magnitudes of parameter values, you will be familiar with the error: 
+A detailed explanation of the model can be found here (Padfield _et. al_ 2016). So we can load the data in and then write a function to run the model.
 
-`Error in nlsList(Y ~ function(X)|factor): singular gradient`
 
-that is often caused by starting parameters being too far away from the actual values in parameter space. This often means `nlsList()` is inadequate for fitting multiple non-linear models.
-
-`nlsLoop` is a package hosted on [GitHub](https://github.com/padpadpadpad/TeamPhytoplankton) that allows multiple starting values to be used to ensure the best fit to each separate curve.
-`nlsLoop::nlsLoop()` fits the same model over a level of a factor and allows multiple starting values and picks the best model using AIC score.
-
-#### Key parameters of nlsLoop()
-- model: the non-linear model specification
-- data: the raw data frame
-- tries: the number of combinations of starting values you want the model to try
-- id_col: the column that has a unique identifier for each specific curve you want to model
-- param\_bds: a vector specifying the boundaries of your starting parameter estimates. It is important to __LOOK__ at your data and previous literature at this point to try and work what reasonable ranges of parameters are! 
-    - These are specified as c(lower bound parameter 1, upper bound parameter 1, lower bound parameter 2, upper bound parameter 2, lower bound parameter _n_, upper bound parameter _n_).
-- _r<sup>2</sup>_ : whether or not you want to calculate an _r<sup>2</sup>_ value for each of your fits. This parameter comes with a [warning](http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model) that _r<sup>2</sup>_ do not mean the same things for non-linear models as they do for linear models<sup>[1]</sup>.
-
-## Using nlsLoop
-
-#### 1. Load in packages and install nlsLoop
-
-```{r load in packages, message=FALSE, warning=FALSE}
-
-library(nlsLoop)
-library(ggplot2)
-
-```
-
-#### 2. Load in data frame and initial plot
 
 The data we shall use for this tutorial are a bunch of thermal performance curves showing the relationship between metabolic rates and temperature in the aquatic alga, _Chlorella vulgaris_<sup>[2]</sup>.
 
