@@ -88,7 +88,7 @@ Having all of the elements in a single __nlsLoop__ object allows a simple plotti
 
 __nlsLoop__ provides an easy wrapper to ggplot2 to do this. Firstly lets have a look at a single level of `curve_id`, a function called __plot_id_nlsLoop__ allows this.
 
-```{r first_fit_plot, fig.height=6, fig.width=8}
+```{r first_fit_plot, fig.height=5,  fig.width = 7}
 plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
 ```
 
@@ -100,7 +100,7 @@ plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_T
 
 Instead of using the plotting functions within the package, we can easily create plots using ggplot and the predictions dataframe. For example, we can plot all the curve fits split by growth temperature and acclimation _vs._ adaptation
 
-```{r data wrangling, fig.width=12, fig.height=9}
+```{r data wrangling, fig.height=7,  fig.width = 7}
 # get distinct values of process, flux and growth.temp for each value of curve_id
 d_treatment <- Chlorella_TRC[,c('curve_id','process', 'growth.temp', 'flux')]
 d_treatment <- d_treatment[!duplicated(d_treatment),]
@@ -115,15 +115,16 @@ ggplot() +
   geom_line(aes(K, ln.rate, col = flux, group = curve_id), alpha = 0.5, fits$predictions) +
   facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = F)) +
   scale_colour_manual(values = c('green4', 'black')) +
-  theme_bw(base_size = 16, base_family = 'Helvetica') +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
   ylab('log Metabolic rate') +
-  xlab('Assay temperature (ºC)')
+  xlab('Assay temperature (ºC)') +
+  theme(legend.position = c(0.9, 0.15))
 
 ```
 
 We can also start having a quick look at any differences between parameters. Here we will plot them pooled between fluxes.
 
-```{r parameter_plots, fig.height=8, fig.width=10}
+```{r parameter_plots, fig.height=5, fig.width=6}
 # merge params with d_treatment by curve_id
 fits$params <- merge(fits$params, d_treatment, by = 'curve_id')
 
@@ -136,7 +137,8 @@ gather(fits$params, 'parameter', 'value', c(lnc, E, Eh, Th)) %>%
   facet_wrap(~ parameter, scales = 'free_y') +
   scale_color_manual(values = c('green4', 'black')) +
   scale_shape_manual(values = c(21, 24)) +
-  theme_bw(base_size = 16, base_family = 'Helvetica')
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme(legend.position = 'top')
 ```
 
 When you are happy with your starting parameter values, __nlsLoop2__ can be used to speed up your model fitting.
