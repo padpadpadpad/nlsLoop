@@ -1,0 +1,151 @@
+---
+title: "nlsLoop"
+author: "Daniel Padfield"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nlsLoop}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+__nlsLoop__ is a simple R package that gives a more reproducible and reliable method for fitting individual non-linear regression fits over levels of a factor within a data frame. This procedure is commonly done using __nlme::nlsList__, but this function can only use one set of parameter values. Consequently, some levels of the factor fail to converge on the correct parameter value simply because of the starting values. __nlsLoop__ allows multiple starting values for each parameter, therefore allowing for more parameter space to be explored when model fitting. The best model is chosen based on AIC score.
+
+This document provides an introduction into this one key use of __nlsLoop__, and also demonstrates its potential for producing predictions around each fit and exploratory plotting.
+
+## An example non-linear model fit
+
+This vignette will use data from a dataset of thermal response curves for photosynthesis and respiration of the aquatic phytoplankton _Chlorella vulgaris_ (Padfield _et. al_ 2016). This data represents the rate of photosynthesis and respiration at different short-term, assay temperatures (16 ºC to 46 ºC) and was done in triplicate at 5 growth temperatures (20  ºC, 23 ºC, 27 ºC, 30 ºC and 33 ºC) after both 10 (acclimation) and 100 (adaptation) generations of growth.
+
+This gives 60 curves in total. These responses generally follow a unimodal response and there are various models that have been used to fit to the data. A very recent overview of these can be found [here](http://onlinelibrary.wiley.com/doi/10.1002/ece3.3576/epdf) and the authors also released an R package which contains many of these [models](https://cran.r-project.org/web/packages/temperatureresponse/index.html) (Low-Decarie _et al._ 2017).
+
+I will demonstrate how the model can be fitted with the Sharpe-Schoolfield model of the form:
+
+A detailed explanation of the model can be found here (Padfield _et. al_ 2016). So we can load the data in and then write a function to run the model.
+
+We begin with loading in the data, which comes with the package. 
+
+```{r load_in data, tidy=TRUE}
+# load in package
+library(nlsLoop)
+
+# load in data
+data('Chlorella_TRC')
+
+# look at column names
+names(Chlorella_TRC)
+```
+
+We then need to specify the non-linear model we shall fit to the data
+
+```{r schoolfield_high, tidy = TRUE}
+# define the Sharpe-Schoolfield equation
+schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
+  Tc <- 273.15 + Tc
+  k <- 8.62e-5
+  boltzmann.term <- lnc + log(exp(E/k*(1/Tc - 1/temp)))
+  inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
+  return(boltzmann.term + inactivation.term)
+  }
+```
+
+We can then run __nlsLoop__, as long as we have a column in the dataframe that identifies each level of the factor. This column, __id_col__, can be either a __character__ or a __factor__. It is going to be very useful that this column contains information about the data, possible the treatments, separated by '_'. The __id_col__ is what allows you to link your raw data with your parameters and your predictions at a later date, so being able to split this column back up into treatment columns is often a great option.
+
+It can still be advisable to run a single __nls()__ fit on the entire dataset in an attempt to give your parameter values some ball park boundaries. If you do not then you may suffer the same problems with __nlsLoop__ as are experienced with __nlsList__.
+
+```{r nlsLoop, message=FALSE, warning=FALSE, results='hide'}
+fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
+                     data = Chlorella_TRC,
+                     tries = 500,
+                     id_col = 'curve_id',
+                     param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                     r2 = 'Y',
+                     supp_errors = 'Y',
+                     AICc = 'Y',
+                     na.action = na.omit,
+                     lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
+```
+
+The documentation for __nlsLoop__ can be found by using `?nlsLoop`. The argument `param_bds` sets upper and lower limits for each parameter from which random values between these are picked. The list of values goes through the lower and upper boundary for each parameter in turn (i.e. $lnc_{lower}$, $lnc_{lower}$, $E_{lower}$, $E_{upper}$ ...).
+
+When running, the code gives messages of progress of how far through the number of curve fits the code is, and prints the number of curve fits (every ten) that a single curve fit is through. If the AIC score does not get lower for 100 different fits to the data (using different parameter values) __nlsLoop__ moves onto the next curve fit.
+
+__nlsLoop__ returns an `nlsLoop` object that works the same way as a list. It is made up of:
+    - __formula__ the formula used in the fit
+    - __info__ some information on the dependent and independent parameters. These are used in the plotting functions __plot_all_nlsLoop__ and __plot_id_nlsLoop__
+    - __params__ which has all of our parameter values for each individual fit
+    - __predictions__ which is a dataframe of the predicted fits of each curve, from each individual fits minimum and maximum predictor values. This is given in stacked, tidy format, ready for incorporation with ggplot2
+
+```{r, look_at_fits}
+# look at parameter values
+head(fits$params)
+
+# look at fits
+head(fits$params)
+```
+
+Having all of the elements in a single __nlsLoop__ object allows a simple plotting method to assess how good our fits to the data are.  Although AIC scores pick the best model, this is relative to all the other fits and does not tell us anything about how well the model fits the data. The package does include a way to calculate a quasi-rsquared score, but use this at your own risk. Non-linear versions of rsquared do not necessarily mean the same thing as linear rsquared values do (Spiess & Neumeyer 2010). Another way of evaluating model fit is by plotting the predictions alongside the raw data.
+
+__nlsLoop__ provides an easy wrapper to ggplot2 to do this. Firstly lets have a look at a single level of `curve_id`, a function called __plot_id_nlsLoop__ allows this.
+
+```{r first_fit_plot, fig.height=5,  fig.width = 7}
+plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
+```
+
+Further to this, __plot_all_nlsLoop__ will produce a pdf with each plot on a new sheet.
+
+```{r pdf_fits, eval=FALSE}
+plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_TRC, param_data = fits)
+```
+
+Instead of using the plotting functions within the package, we can easily create plots using ggplot and the predictions dataframe. For example, we can plot all the curve fits split by growth temperature and acclimation _vs._ adaptation
+
+```{r data wrangling, fig.height=7,  fig.width = 7}
+# get distinct values of process, flux and growth.temp for each value of curve_id
+d_treatment <- Chlorella_TRC[,c('curve_id','process', 'growth.temp', 'flux')]
+d_treatment <- d_treatment[!duplicated(d_treatment),]
+
+# merge with predictions by curve_id
+fits$predictions <- merge(fits$predictions, d_treatment, by = 'curve_id')
+
+# plot every curve
+library(ggplot2)
+ggplot() +
+  geom_point(aes(K, ln.rate, col = flux), size = 2, Chlorella_TRC) +
+  geom_line(aes(K, ln.rate, col = flux, group = curve_id), alpha = 0.5, fits$predictions) +
+  facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = F)) +
+  scale_colour_manual(values = c('green4', 'black')) +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  ylab('log Metabolic rate') +
+  xlab('Assay temperature (ºC)') +
+  theme(legend.position = c(0.9, 0.15))
+
+```
+
+We can also start having a quick look at any differences between parameters. Here we will plot them pooled between fluxes.
+
+```{r parameter_plots, fig.height=5, fig.width=6}
+# merge params with d_treatment by curve_id
+fits$params <- merge(fits$params, d_treatment, by = 'curve_id')
+
+library(tidyr)
+
+gather(fits$params, 'parameter', 'value', c(lnc, E, Eh, Th)) %>%
+  ggplot(., aes(flux, value, col = flux)) +
+  geom_boxplot(fill = 'white', outlier.shape = NA) +
+  geom_point(position = position_jitter(height = 0, width = 0.1)) +
+  facet_wrap(~ parameter, scales = 'free_y') +
+  scale_color_manual(values = c('green4', 'black')) +
+  scale_shape_manual(values = c(21, 24)) +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme(legend.position = 'top')
+```
+
+When you are happy with your starting parameter values, __nlsLoop2__ can be used to speed up your model fitting.
+
+__nlsLoop__ provides a more reliable and reproducible way of getting individual non-linear fits over levels of a factor of a dataframe. I hope this vignette has provided a good overview of its benefits and usage.
+
+### References:
+    - Spiess, A.N. & Neumeyer, N. (2010). An evaluation of R<sup>2</sup> as an inadequate measure for nonlinear models in pharmacological and biochemical research: a Monte Carlo approach. BMC Pharmacology, 10, 6.
+    - Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19(2), 133-142.
+    - Schoolfield, R.M., Sharpe, P.J. & Magnuson, C.E. (1981). Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theoretical Biology, 88, 719–31.
