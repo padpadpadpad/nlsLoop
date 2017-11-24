@@ -17,7 +17,7 @@ This document provides an introduction into this one key use of __nlsLoop__, and
 
 This vignette will use data from a dataset of thermal response curves for photosynthesis and respiration of the aquatic phytoplankton _Chlorella vulgaris_ (Padfield _et. al_ 2016). This data represents the rate of photosynthesis and respiration at different short-term, assay temperatures (16 ºC to 46 ºC) and was done in triplicate at 5 growth temperatures (20  ºC, 23 ºC, 27 ºC, 30 ºC and 33 ºC) after both 10 (acclimation) and 100 (adaptation) generations of growth.
 
-This gives 60 curves in total. These responses generally follow a unimodal response and there are various models that have been used to fit to the data. A very recent overview of these can be found [here](http://onlinelibrary.wiley.com/doi/10.1002/ece3.3576/epdf) and the authors also released an R package which contains many of these [models](https://cran.r-project.org/web/packages/temperatureresponse/index.html) (Low-Decarie _et al._ 2017).
+This gives 60 curves in total. These responses generally follow a unimodal response and there are various models that have been used to fit to the data. A very recent overview of these can be found [here](http://onlinelibrary.wiley.com/doi/10.1002/ece3.3576/epdf) and the authors also released an R package which contains many of these [models](https://cran.r-project.org/package=temperatureresponse) (Low-Decarie _et al._ 2017).
 
 I will demonstrate how the model can be fitted with the Sharpe-Schoolfield model of the form:
 
