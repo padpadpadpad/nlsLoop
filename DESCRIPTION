@@ -1,8 +1,8 @@
 Package: nlsLoop
-Title: Tools for Finding the Best Fits for Non-Least Squares Regression over the Level of a Factor
+Title: Tools for Finding the Best Estimated Fits for Non-Least Squares Regression over the Level of a Factor
 Version: 1.0.0
 Authors@R: person("Daniel", "Padfield", email = "d.padfield@exeter.ac.uk", role = c("aut", "cre"))
-Description: Provides a better way fitting multiple non-linear models over levels of a factor in a dataset compared to nlme::nlsList by allowing multiple starting parameters to be used.
+Description: Improves the fitting of non-linear regression over levels of factor by allowing multiple starting parameters.
 Depends:
     R (>= 3.2.1)
 License: GPL-3
