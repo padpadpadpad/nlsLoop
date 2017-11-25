@@ -16,17 +16,10 @@ bibliography: paper.bib
 
 # Summary
 
-- A summary describing the high-level functionality and purpose of the software
-for a diverse, non-specialist audience
-- A clear statement of need that illustrates the purpose of the software
-- A list of key references including a link to the software archive
-- Mentions (if applicable) of any ongoing research projects using the software
-or recent scholarly publications enabled by it
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-This is an example citation [@figshare_archive].
+__nlsLoop__ is a simple R package that gives a more reproducible and reliable method for fitting individual non-linear regression fits over levels of a factor. This procedure is commonly done using __nlme::nlsList__, but this function only uses one set of parameter values. Consequently, some curves fail to converge on the correct parameter values simply because of the starting values being too far away from the starting values. __nlsLoop__ improves on __nlme::nlsList__ by allowing multiple starting values for each parameter, thereby exploring more parameter space when model fitting. The best model is chosen based on AIC score, ensuring that results are more reproducible and replicable.
+- This method and the R package __nlsLoop__ have been used in multiple publications in the last two years (Padfield _et al._ 2016, Padfield _et al._ 2017).
 
 # References
+
+- Padfield, D., Yvon-Durocher, G., Buckling, A., Jennings, S. & Yvon-Durocher, G. (2016). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19, 133–142
+- Padfield, D., Lowe, C., Buckling, A., Ffrench-Constant, R., Jennings, S., Shelley, F., et al. (2017). Metabolic compensation constrains the temperature dependence of gross primary production. Ecology Letters, 20, 1250–1260.
