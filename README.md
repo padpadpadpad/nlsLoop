@@ -9,17 +9,17 @@ Tools for expanding the non-linear regression method nls and nlsList from nlme.
 
 Please report any issues/suggestions in the [issues link](https://github.com/padpadpadpad/nlsLoop/issues) for the repository.
 
-Mac: [![Build Status](https://travis-ci.org/padpadpadpad/nlsLoop.svg?branch=master)](https://travis-ci.org/padpadpadpad/nlsLoop)
+Travis: [![Build Status](https://travis-ci.org/padpadpadpad/nlsLoop.svg?branch=master)](https://travis-ci.org/padpadpadpad/nlsLoop)
 
 ### Overview
 
 The mainstay of this package is `nlsLoop::nlsLoop()`. If you have a dataset where you want to fit the same model over many levels of a factor, you may use `nlme::nlsList()`. However, `nlsList()` only allows for one set of starting values so it is possible that not all of the models will converge if the shape of the data, and thus likely parameter values, are very different.
 
-`nlsLoop()` allows for a range of starting values and tries unlimited different starting values to the fit at each level of the factor, picking the best fit for each model using AIC scores. The best model
+`nlsLoop()` allows for a range of starting values and tries unlimited different starting values to the fit at each level of the factor, picking the best fit for each model using AIC scores.
 
 ### Tutorial
 
-A more in-depth tutorial and explanation of parameters in `nlsLoop()` can be found as a [blog post](https://padpadpadpad.github.io/post/introducing-nlsloop/) or as a vignette of the package.
+A more in-depth tutorial and explanation of how to use `nlsLoop()` can be found as a [blog post](https://padpadpadpad.github.io/post/introducing-nlsloop/) or by calling `vignette('nlsLoop)` from within R.
 
 ### Installation and examples
 
@@ -66,7 +66,7 @@ fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
 
 ``` r
 head(fits$params)
-#>   curve_id       lnc         E       Eh       Th      AIC  quasi.r2
+#>   curve_id       lnc         E       Eh       Th      AIC  quasi_r2
 #> 1        1 -1.346211 0.9877307 4.332645 312.1887 48.01896 0.4608054
 #> 2        2 -1.349431 1.0653450 4.211374 312.6591 22.39398 0.8978426
 #> 3        3 -1.815315 1.1155333 4.140395 310.9545 34.77114 0.7804032

@@ -22,17 +22,15 @@ Please report any issues/suggestions in the [issues link](https://github.com/pad
 
 Travis: [![Build Status](https://travis-ci.org/padpadpadpad/nlsLoop.svg?branch=master)](https://travis-ci.org/padpadpadpad/nlsLoop)
 
-
-
 ### Overview
 
 The mainstay of this package is `nlsLoop::nlsLoop()`. If you have a dataset where you want to fit the same model over many levels of a factor, you may use `nlme::nlsList()`. However, `nlsList()` only allows for one set of starting values so it is possible that not all of the models will converge if the shape of the data, and thus likely parameter values, are very different.
 
-`nlsLoop()` allows for a range of starting values and tries unlimited different starting values to the fit at each level of the factor, picking the best fit for each model using AIC scores. The best model 
+`nlsLoop()` allows for a range of starting values and tries unlimited different starting values to the fit at each level of the factor, picking the best fit for each model using AIC scores.
 
 ### Tutorial
 
-A more in-depth tutorial and explanation of parameters in `nlsLoop()` can be found as a [blog post](https://padpadpadpad.github.io/post/introducing-nlsloop/) or as a vignette of the package.
+A more in-depth tutorial and explanation of how to use `nlsLoop()` can be found as a [blog post](https://padpadpadpad.github.io/post/introducing-nlsloop/) or by calling `vignette('nlsLoop)` from within R.
 
 ### Installation and examples
 
