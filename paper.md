@@ -21,5 +21,5 @@ __nlsLoop__ is a simple R package that gives a more reproducible and reliable me
 
 # References
 
-- Padfield, D., Yvon-Durocher, G., Buckling, A., Jennings, S. & Yvon-Durocher, G. (2016). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19, 133–142
-- Padfield, D., Lowe, C., Buckling, A., Ffrench-Constant, R., Jennings, S., Shelley, F., et al. (2017). Metabolic compensation constrains the temperature dependence of gross primary production. Ecology Letters, 20, 1250–1260.
+- Padfield, D., Yvon-Durocher, G., Buckling, A., Jennings, S. & Yvon-Durocher, G. (2016). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19, 133–142. doi:10.1111/ele.12545
+- Padfield, D., Lowe, C., Buckling, A., Ffrench-Constant, R., Jennings, S., Shelley, F., et al. (2017). Metabolic compensation constrains the temperature dependence of gross primary production. Ecology Letters, 20, 1250–1260. doi:10.1111/ele.12820
