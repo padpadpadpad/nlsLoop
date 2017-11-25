@@ -6,6 +6,10 @@
 
 language: objective-c
 
+os:
+  - linux
+  - osx
+
 sudo: required
 
 before_install:

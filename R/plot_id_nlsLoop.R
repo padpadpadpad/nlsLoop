@@ -1,12 +1,12 @@
 # function
 
-#' Creates a graph of one of the levels of id_col with raw data and corresponding predictions
+#' Creates a graph of one of the levels of id_col with the data points and corresponding predictions
 #'
 #' @param raw_data the data frame containing the data used in the nlsLoop argument.
 #' @param param_data the nlsLoop object.
 #' @param id the level of \code{id_col} from which the plot is desired.
 #' @author Daniel Padfield
-#' @return a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
+#' @return a plot using ggplot2 of the points and predictions of a single level of \code{id_col}
 #' @examples
 #' # load in data
 #'

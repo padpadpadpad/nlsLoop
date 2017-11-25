@@ -1,10 +1,10 @@
 #' plot_all_nlsLoop
 #'
-#' plot a pdf of all curves fitted with nlsLoop
+#' creates a pdf of all curves fitted with nlsLoop
 #'
 #' Creates a pdf where each new page is a graph of one level of \code{id_col} with raw data and corresponding predictions.
 #' @param file_name the desired path for the pdf to be saved to.
-#' @param raw_data the data frame containing the data used in the nlsLoop argument
+#' @param data the data frame containing the data used in the nlsLoop argument
 #' @param param_data the nlsLoop object
 #' @param id_col an optional argument if a different column is desired from which each new plot panel is chosen
 #' @param col_point optional argument to control colour of points
@@ -12,7 +12,7 @@
 #' @param group optional argument to ensure lines are grouped properly
 #' @param ... extra arguments to feed into \code{function(pdf)}
 #' @author Daniel Padfield
-#' @return a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
+#' @return a plot using ggplot2 of the points and predictions of a single level of \code{id_col}
 #' @examples
 #' # load in data
 #'
@@ -38,11 +38,11 @@
 #'                 lower = c(lnc=-10, E=0, Eh=0, Th=0))
 #' \dontrun{
 #'
-#' plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', raw_data = Chlorella_TRC_test, param_data = fits)
+#' plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', data = Chlorella_TRC_test, param_data = fits)
 #' }
 #' @export plot_all_nlsLoop
 
-plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col_point = NULL, col_line = NULL, group = NULL, ...){
+plot_all_nlsLoop <- function(file_name, data, param_data, id_col = NULL, col_point = NULL, col_line = NULL, group = NULL, ...){
 
   # if statements if things are null
   if(is.null(id_col)){id_col <- as.character(unique(param_data$info$id_col))}
@@ -53,16 +53,16 @@ plot_all_nlsLoop <- function(file_name, raw_data, param_data, id_col = NULL, col
   x <- as.character(unique(param_data$info$params_ind))
   y <- as.character(unique(param_data$info$param_dep))
 
-  if(!is.null(col_point)){raw_data <- raw_data[, c(x, y, id_col, col_point)]}
-  if(is.null(col_point)){raw_data <- raw_data[, c(x, y, id_col)]}
-  raw_data <- raw_data[stats::complete.cases(raw_data),]
+  if(!is.null(col_point)){data <- data[, c(x, y, id_col, col_point)]}
+  if(is.null(col_point)){data <- data[, c(x, y, id_col)]}
+  data <- data[stats::complete.cases(data),]
 
   predict_data <- param_data$predictions
 
-  id <- unique(raw_data[,id_col])
+  id <- unique(data[,id_col])
   grDevices::pdf(file_name, ...)
   for(i in 1:length(id)){
-    temp_raw <- raw_data[raw_data[,id_col] == id[i],]
+    temp_raw <- data[data[,id_col] == id[i],]
     temp_pred <-  predict_data[predict_data[,id_col] == id[i],]
     plot <- ggplot2::ggplot() +
       ggplot2::ylab(y) +

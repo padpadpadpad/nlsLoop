@@ -1,34 +1,32 @@
 #' Loops through a non-linear model on many different curves to find the best
-#' possible fit.
+#' possible estimates
 #'
-#' Fits the best possible model to each of a set of curves using non-linear
-#' least squares regression using minpack.lm::nlsLM(). The best fit is determined using AIC scores.
+#' Fiinds the best estimated model to each of a set of curves using non-linear
+#' least squares regression using nlsLM(). The best fit is determined using AIC scores.
 #'
-#' @param data the raw data frame.
-#' @param model a non-linear model formula, with the response on the left of a ~ operatory and an expression involving parameters on the right.
+#' @param data a data frame containing an column to differentiate between curves and the response and predictor variables.
+#' @param model a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right.
 #' @param tries number of combinations of starting parameters that
 #' are tried on each curve.
 #' @param id_col the column name that identifies each curve that is to be
 #' fitted in "".
-#' @param param_bds upper and lower boundaries for the start parameters. If
+#' @param param_bds lower and upper boundaries for the start parameters. If
 #' missing these default to +/- 1e+09. Need to specified as a vector as :
 #' c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
 #' param 2 etc)
-#' @param r2 whether or not you want the quasi rsquared value to be returned.
+#' @param r2 whether or not the quasi rsquared value is calculated and returned.
 #' This defaults to no, to include the r2 values use \code{r2 = 'Y'}.
 #' @param supp_errors if \code{supp_errors = 'Y'}, then no error messages will be shown
-#' from the actual nlsLM function, reducing the number of error messages
-#' received while the model works through starting parameters from which the
-#' model cannot converge. Advised to only be used once it is expected that
-#' error messages in the nlsLM function are not important.
+#' from the nlsLM function, reducing the number of error messages
+#' printed while the model attempts to converge using poor starting parameters. Advised to only use \code{supp_errors = 'Y'} when you are confident in the bounds of your starting parameters.
 #' @param AICc whether or not the small sample AIC should be used. Defaults to
 #' \code{'Y'}. Override this using \code{AICc == 'N'}. AICc should be used instead of AIC
 #' when sample size is small in comparison to the number of estimated
-#' parameters (Burnham & Anderson 2002 recommend its use when n / n.param < 40).
-#' @param control if specific control arguments are desired they can be specified using \code{\link[minpack.lm]{nls.lm.control}}.
-#' @param return_preds whether you want to return the predictions with the parameters or not. Defaults to yes ('Y'). Add 'N' to change to no
+#' parameters (Burnham & Anderson 2002 recommend its use when n / n_param < 40).
+#' @param control specific control can be specified using \code{\link[minpack.lm]{nls.lm.control}}.
+#' @param return_preds whether predictions of each individual model fit are wanted alongside the parameters or. Defaults to yes ('Y'). Add 'N' to change to no.
 #' @param \dots Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.
-#' @return returns a list of class \code{nlsLoop}. Notable elements within the list are \code{$params} and \code{$predictions} that give the best fit parameters and predictions based on these parameters.
+#' @return returns a list of class \code{nlsLoop}. Notable elements within the list are \code{$params} and \code{$predictions} that give the best fit parameters and predictions based on these parameters for each individual fit.
 #' @note Useful additional arguments for \code{\link[minpack.lm]{nlsLM}} include: \code{na.action = na.omit},
 #' \code{lower/upper = c()} where these represent upper and lower boundaries for
 #' parameter estimates

@@ -23,7 +23,7 @@ models. The formula for calculating this is given in the paper in the
 references (Spiess 2010).
 }
 \details{
-cautionary notes of whether its useful are provided in \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{this} StackOverflow discussion reference. A personal highlight of which is 'If someone asks for rope to hang themselves, its fine to give it to them (while performing due diligence by asking "are you sure you want to do this?")'
+cautionary notes of whether its useful are provided \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{here}. A personal highlight of which is 'If someone asks for rope to hang themselves, its fine to give it to them (while performing due diligence by asking "are you sure you want to do this?")'
 
 Calculated as :
 
@@ -58,7 +58,7 @@ quasi_rsq_nls(fit, Chlorella_TRC[Chlorella_TRC$curve_id == 1,]$ln.rate, 4)
 0.4608054
 }
 \references{
-Spiess, A.-N. & Neumeyer, N. (2010) An evaluation of R2 as an
+Spiess, A.N. & Neumeyer, N. (2010) An evaluation of R2 as an
 inadequate measure for nonlinear models in pharmacological and biochemical
 research: a Monte Carlo approach. BMC pharmacology, 10, 6.
 

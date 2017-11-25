@@ -9,7 +9,7 @@
 #' @param y a vector of the response variable from the model.
 #' @param param the number of parameters of the non-linear model
 #' @return value of r squared for specific non-linear model object
-#' @details cautionary notes of whether its useful are provided in \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{this} StackOverflow discussion reference. A personal highlight of which is 'If someone asks for rope to hang themselves, its fine to give it to them (while performing due diligence by asking "are you sure you want to do this?")'
+#' @details cautionary notes of whether its useful are provided \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{here}. A personal highlight of which is 'If someone asks for rope to hang themselves, its fine to give it to them (while performing due diligence by asking "are you sure you want to do this?")'
 #'
 #' Calculated as :
 #'
@@ -23,7 +23,7 @@
 #'
 #' (n - 1)*var(y)
 #' @author Daniel Padfield
-#' @references Spiess, A.-N. & Neumeyer, N. (2010) An evaluation of R2 as an
+#' @references Spiess, A.N. & Neumeyer, N. (2010) An evaluation of R2 as an
 #' inadequate measure for nonlinear models in pharmacological and biochemical
 #' research: a Monte Carlo approach. BMC pharmacology, 10, 6.
 #'

@@ -4,13 +4,13 @@
 \alias{plot_all_nlsLoop}
 \title{plot_all_nlsLoop}
 \usage{
-plot_all_nlsLoop(file_name, raw_data, param_data, id_col = NULL,
+plot_all_nlsLoop(file_name, data, param_data, id_col = NULL,
   col_point = NULL, col_line = NULL, group = NULL, ...)
 }
 \arguments{
 \item{file_name}{the desired path for the pdf to be saved to.}
 
-\item{raw_data}{the data frame containing the data used in the nlsLoop argument}
+\item{data}{the data frame containing the data used in the nlsLoop argument}
 
 \item{param_data}{the nlsLoop object}
 
@@ -25,10 +25,10 @@ plot_all_nlsLoop(file_name, raw_data, param_data, id_col = NULL,
 \item{...}{extra arguments to feed into \code{function(pdf)}}
 }
 \value{
-a plot using ggplot2 of the raw points and predictions of a single level of \code{id_col}
+a plot using ggplot2 of the points and predictions of a single level of \code{id_col}
 }
 \description{
-plot a pdf of all curves fitted with nlsLoop
+creates a pdf of all curves fitted with nlsLoop
 }
 \details{
 Creates a pdf where each new page is a graph of one level of \code{id_col} with raw data and corresponding predictions.
@@ -58,7 +58,7 @@ fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                 lower = c(lnc=-10, E=0, Eh=0, Th=0))
 \dontrun{
 
-plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', raw_data = Chlorella_TRC_test, param_data = fits)
+plot_all_nlsLoop('WhereYouWillSaveTheFile.pdf', data = Chlorella_TRC_test, param_data = fits)
 }
 }
 \author{

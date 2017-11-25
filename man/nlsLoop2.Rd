@@ -3,55 +3,54 @@
 \name{nlsLoop2}
 \alias{nlsLoop2}
 \title{Loops through a non-linear model on many different curves to find the best
-possible fit}
+possible estimates}
 \usage{
 nlsLoop2(model, data, id_col, tries, param_bds, r2 = c("Y", "N"),
   supp_errors = c("Y", "N"), AICc = c("Y", "N"), return_preds, control, alg,
   ...)
 }
 \arguments{
-\item{model}{a non-linear model formula, with the response on the left of a ~ operatory and an expression involving parameters on the right.}
+\item{model}{a non-linear model formula, with the response on the left of a ~ operator and an expression involving parameters on the right.}
 
-\item{data}{the raw data frame.}
+\item{data}{a data frame containing an column to differentiate between curves and the response and predictor variables.}
 
 \item{id_col}{the column name that identifies each curve that is to be
 fitted in "".}
 
-\item{tries}{number iterations to use on nls2 to find best parameters}
+\item{tries}{number of combinations of starting parameters that
+are tried on each curve.}
 
-\item{param_bds}{upper and lower boundaries for the start parameters. If
+\item{param_bds}{lower and upper boundaries for the start parameters. If
 missing these default to +/- 1e+09. Need to specified as a vector as :
 c(lower bound param 1, upper bound param 1, lower bound param 2, upper bound
 param 2 etc)}
 
-\item{r2}{whether or not you want the quasi rsquared value to be returned.
+\item{r2}{whether or not the quasi rsquared value is calculated and returned.
 This defaults to no, to include the r2 values use \code{r2 = 'Y'}.}
 
 \item{supp_errors}{if \code{supp_errors = 'Y'}, then no error messages will be shown
-from the actual nlsLM function, reducing the number of error messages
-received while the model works through starting parameters from which the
-model cannot converge. Advised to only be used once it is expected that
-error messages in the nlsLM function are not important.}
+from the nlsLM function, reducing the number of error messages
+printed while the model attempts to converge using poor starting parameters. Advised to only use \code{supp_errors = 'Y'} when you are confident in the bounds of your starting parameters.}
 
 \item{AICc}{whether or not the small sample AIC should be used. Defaults to
 \code{'Y'}. Override this using \code{AICc == 'N'}. AICc should be used instead of AIC
 when sample size is small in comparison to the number of estimated
-parameters (Burnham & Anderson 2002 recommend its use when n / n.param < 40).}
+parameters (Burnham & Anderson 2002 recommend its use when n / n_param < 40).}
 
-\item{return_preds}{whether you want to return the predictions with the parameters or not. Defaults to yes. Add 'N' to change to no}
+\item{return_preds}{whether predictions of each individual model fit are wanted alongside the parameters or. Defaults to yes ('Y'). Add 'N' to change to no.}
 
-\item{control}{if specific control arguments are desired they can be specified using \code{\link[minpack.lm]{nls.lm.control}}.}
+\item{control}{specific control can be specified using \code{\link[minpack.lm]{nls.lm.control}}.}
 
-\item{alg}{the algorithm with which to scan for start parameters. See \code{\link[nls2]{nls2}} for details. Defaults to \code{plinear-random}}
+\item{alg}{the algorithm with which to scan for start parameters. See \code{\link[nls2]{nls2}} for details. Defaults to \code{plinear-random}.}
 
-\item{\dots}{extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.}
+\item{\dots}{Extra arguments to pass to \code{\link[minpack.lm]{nlsLM}} if necessary.}
 }
 \value{
-returns a list of class \code{nlsLoop}. Notable elements within the list are \code{$params} and \code{$predictions} that give the best fit parameters and predictions based on these parameters.
+returns a list of class \code{nlsLoop}. Notable elements within the list are \code{$params} and \code{$predictions} that give the best fit parameters and predictions based on these parameters for each individual fit.
 }
 \description{
-Fits the best possible model to each of a set of curves using non-linear
-least squares regression using minpack.lm::nlsLM(). Start parameters are found using nls2
+Fiinds the best estimated model to each of a set of curves using non-linear
+least squares regression using nlsLM(). Start parameters are found using nls2
 }
 \note{
 Useful additional arguments for \code{\link[minpack.lm]{nlsLM}} include: \code{na.action = na.omit},

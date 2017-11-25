@@ -9,7 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-__nlsLoop__ is a simple R package that gives a more reproducible and reliable method for fitting individual non-linear regression fits over levels of a factor within a data frame. This procedure is commonly done using __nlme::nlsList__, but this function can only use one set of parameter values. Consequently, some levels of the factor fail to converge on the correct parameter value simply because of the starting values. __nlsLoop__ allows multiple starting values for each parameter, therefore allowing for more parameter space to be explored when model fitting. The best model is chosen based on AIC score.
+__nlsLoop__ is a simple R package that gives a more reproducible and reliable method for fitting individual non-linear regression fits over levels of a factor. This procedure is commonly done using __nlme::nlsList__, but this function only uses one set of parameter values. Consequently, some curves fail to converge on the correct parameter values simply because of the starting values being too far away from the starting values. __nlsLoop__ improves on __nlme::nlsList__ by allowing multiple starting values for each parameter, thereby exploring more parameter space when model fitting. The best model is chosen based on AIC score, ensuring that the same run of __nlsLoop__ will always give the same set of parameters, as long as the number of tries for each fit is large enough.
 
 This document provides an introduction into this one key use of __nlsLoop__, and also demonstrates its potential for producing predictions around each fit and exploratory plotting.
 
@@ -19,11 +19,13 @@ This vignette will use data from a dataset of thermal response curves for photos
 
 This gives 60 curves in total. These responses generally follow a unimodal response and there are various models that have been used to fit to the data. A very recent overview of these can be found [here](http://onlinelibrary.wiley.com/doi/10.1002/ece3.3576/epdf) and the authors also released an R package which contains many of these [models](https://cran.r-project.org/package=temperatureresponse) (Low-Decarie _et al._ 2017).
 
-I will demonstrate how the model can be fitted with the Sharpe-Schoolfield model of the form:
+I will demonstrate how the unimodal resposne can be fitted with the Sharpe-Schoolfield equation of the form:
 
-A detailed explanation of the model can be found here (Padfield _et. al_ 2016). So we can load the data in and then write a function to run the model.
+$$log(rate) = lnc + E(\frac{1}{T_{c}} - \frac{1}{kT}) - ln(1 + e^{E_h(\frac{1}{kT_h} - \frac{1}{kT})})$$
 
-We begin with loading in the data, which comes with the package. 
+Where $k$ is Boltzmann's constant $8.62e^{-5}$ and $T$ is temperature in Kelvin. A detailed explanation of the other parameters model can be found here (Padfield _et. al_ 2016)[http://onlinelibrary.wiley.com/doi/10.1111/ele.12545/epdf]. 
+
+We begin with loading in the data, which comes with the package.
 
 ```{r load_in data, tidy=TRUE}
 # load in package
@@ -36,7 +38,7 @@ data('Chlorella_TRC')
 names(Chlorella_TRC)
 ```
 
-We then need to specify the non-linear model we shall fit to the data
+We then need to specify the non-linear model to fit to the data
 
 ```{r schoolfield_high, tidy = TRUE}
 # define the Sharpe-Schoolfield equation
@@ -49,9 +51,9 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
   }
 ```
 
-We can then run __nlsLoop__, as long as we have a column in the dataframe that identifies each level of the factor. This column, __id_col__, can be either a __character__ or a __factor__. It is going to be very useful that this column contains information about the data, possible the treatments, separated by '_'. The __id_col__ is what allows you to link your raw data with your parameters and your predictions at a later date, so being able to split this column back up into treatment columns is often a great option.
+We can then run __nlsLoop__, as long as we have a column in the dataframe that identifies each level of the factor. This column, __id_col__, can be either a __character__ or a __factor__. It is useful to include information about the data, possibly the treatments, separated by '_' in this column. The __id_col__  can link the fitted model objects to the raw data, so being able to split this column back up into treatment columns is often a great option.
 
-It can still be advisable to run a single __nls()__ fit on the entire dataset in an attempt to give your parameter values some ball park boundaries. If you do not then you may suffer the same problems with __nlsLoop__ as are experienced with __nlsList__.
+When first running __nlsLoop__, it is advisable to run a single __nls__ fit on the whole dataset to give your start parameters some ball park boundaries. If you do not then you may suffer the same problems with __nlsLoop__ as are experienced with __nlsList__.
 
 ```{r nlsLoop, message=FALSE, warning=FALSE, results='hide'}
 fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
@@ -66,9 +68,9 @@ fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      lower = c(lnc = -10, E = 0, Eh = 0, Th = 0))
 ```
 
-The documentation for __nlsLoop__ can be found by using `?nlsLoop`. The argument `param_bds` sets upper and lower limits for each parameter from which random values between these are picked. The list of values goes through the lower and upper boundary for each parameter in turn (i.e. $lnc_{lower}$, $lnc_{lower}$, $E_{lower}$, $E_{upper}$ ...).
+The documentation for __nlsLoop__ can be found by using `?nlsLoop`. The argument `param_bds` sets upper and lower limits for each parameter from which random values between these are picked. The list of values goes through the lower and upper boundary for each parameter in turn (i.e. $lnc_{lower}$, $lnc_{lower}$, $E_{lower}$, $E_{upper}$ ...). A data frame is then created with `nrow = tries` of random draws of combinations from all of the parameter values. The model then loops through a call to __nlsLM__ for each of these sets of starting parameters. Each time the AIC score is lower for an individual fit (indicating a better relative fit), the parameter dataframe is updated.
 
-When running, the code gives messages of progress of how far through the number of curve fits the code is, and prints the number of curve fits (every ten) that a single curve fit is through. If the AIC score does not get lower for 100 different fits to the data (using different parameter values) __nlsLoop__ moves onto the next curve fit.
+When running, the code gives messages of progress of how far through the number of curve fits the code is, and prints the number of curve fits (every ten) that a single curve fit is through.  If the AIC score does not get lower for 100 different fits to the data (using different parameter values) __nlsLoop__ moves onto the next curve fit.
 
 __nlsLoop__ returns an `nlsLoop` object that works the same way as a list. It is made up of:
     - __formula__ the formula used in the fit
@@ -146,6 +148,6 @@ When you are happy with your starting parameter values, __nlsLoop2__ can be used
 __nlsLoop__ provides a more reliable and reproducible way of getting individual non-linear fits over levels of a factor of a dataframe. I hope this vignette has provided a good overview of its benefits and usage.
 
 ### References:
-    - Spiess, A.N. & Neumeyer, N. (2010). An evaluation of R<sup>2</sup> as an inadequate measure for nonlinear models in pharmacological and biochemical research: a Monte Carlo approach. BMC Pharmacology, 10, 6.
+    - Low-Décarie, E., Boatman, T.G., Bennett, N., Passfield, W., Gavalás-Olea, A., Siegel, P. & Geider, R.J. (2017) Predictions of response to temperature are contingent on model choice and data quality. Ecology & Evolution.
     - Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19(2), 133-142.
     - Schoolfield, R.M., Sharpe, P.J. & Magnuson, C.E. (1981). Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theoretical Biology, 88, 719–31.
