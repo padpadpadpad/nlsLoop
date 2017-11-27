@@ -161,8 +161,8 @@ ggplot(CIs, aes(col = flux)) +
   scale_color_manual(values = c('green4', 'black')) +
   theme_bw(base_size = 12, base_family = 'Helvetica') +
   theme(legend.position = 'top') +
-  xlab('Parameter estimate') +
-  ylab('curve')
+  xlab('curve') +
+  ylab('parameter estimate')
 
 
 
