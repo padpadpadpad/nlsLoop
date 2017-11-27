@@ -14,7 +14,8 @@ Imports: minpack.lm,
     plyr,
     stats,
     grDevices,
-    nls2
+    nls2,
+    nlstools
 Suggests: knitr,
     rmarkdown,
     tidyr
