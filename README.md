@@ -73,7 +73,7 @@ head(fits$params)
 #>   curve_id       lnc         E       Eh       Th      AIC  quasi_r2
 #> 1        1 -1.346211 0.9877307 4.332645 312.1887 48.01896 0.4608054
 #> 2        2 -1.349431 1.0653450 4.211374 312.6591 22.39398 0.8978426
-#> 3        3 -1.815315 1.1155334 4.140395 310.9545 34.77114 0.7804032
+#> 3        3 -1.815315 1.1155333 4.140395 310.9545 34.77114 0.7804032
 #> 4        4 -1.612615 1.0982576 3.025816 310.6412 31.04688 0.8709134
 #> 5        5 -1.767711 1.1244277 9.010640 317.0688 41.69970 0.7602547
 #> 6        6 -1.717258 1.1727047 4.077252 311.4596 37.03555 0.7289198
@@ -116,8 +116,8 @@ fits$predictions <- merge(fits$predictions, d_treatment, by = 'curve_id')
 
 # plot every curve
 ggplot() +
-  geom_point(aes(K, ln.rate, col = flux), size = 2, Chlorella_TRC) +
-  geom_line(aes(K, ln.rate, col = flux, group = curve_id), alpha = 0.5, fits$predictions) +
+  geom_point(aes(K - 273.15, ln.rate, col = flux), size = 2, Chlorella_TRC) +
+  geom_line(aes(K - 273.15, ln.rate, col = flux, group = curve_id), alpha = 0.5, fits$predictions) +
   facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = F)) +
   scale_colour_manual(values = c('green4', 'black')) +
   theme_bw(base_size = 12, base_family = 'Helvetica') +

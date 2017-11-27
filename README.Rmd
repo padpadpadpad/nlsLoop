@@ -112,8 +112,8 @@ fits$predictions <- merge(fits$predictions, d_treatment, by = 'curve_id')
 
 # plot every curve
 ggplot() +
-  geom_point(aes(K, ln.rate, col = flux), size = 2, Chlorella_TRC) +
-  geom_line(aes(K, ln.rate, col = flux, group = curve_id), alpha = 0.5, fits$predictions) +
+  geom_point(aes(K - 273.15, ln.rate, col = flux), size = 2, Chlorella_TRC) +
+  geom_line(aes(K - 273.15, ln.rate, col = flux, group = curve_id), alpha = 0.5, fits$predictions) +
   facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = F)) +
   scale_colour_manual(values = c('green4', 'black')) +
   theme_bw(base_size = 12, base_family = 'Helvetica') +
