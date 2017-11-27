@@ -32,6 +32,7 @@
 #'                 data = Chlorella_TRC_test,
 #'                 tries = 100,
 #'                 id_col = 'curve_id',
+#'                 supp_errors = 'Y',
 #'                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
 #'                 lower = c(lnc=-10, E=0, Eh=0, Th=0))
 #'
@@ -58,7 +59,7 @@ confint_nlsLoop <- function(data, param_data){
                                  data = dat,
                                  start = params2[colnames(params2) %in% all.vars(formula[[3]])]), silent = TRUE)
     if(!is.null(fit)){
-      confint <- nlstools::confint2(fit, ...)
+      confint <- nlstools::confint2(fit)
       confint <- data.frame(confint)
       confint$param <- row.names(confint)
       colnames(confint)[1:2] <- c('CI_lwr', 'CI_upr')
