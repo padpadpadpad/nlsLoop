@@ -41,6 +41,7 @@ fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                 data = Chlorella_TRC_test,
                 tries = 100,
                 id_col = 'curve_id',
+                supp_errors = 'Y',
                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
                 lower = c(lnc=-10, E=0, Eh=0, Th=0))
 

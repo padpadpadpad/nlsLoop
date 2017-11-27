@@ -91,7 +91,7 @@ Having all of the elements in a single __nlsLoop__ object allows a simple plotti
 __nlsLoop__ provides an easy wrapper to ggplot2 to do this. Firstly lets have a look at a single level of `curve_id`, a function called __plot_id_nlsLoop__ allows this.
 
 ```{r first_fit_plot, fig.height=5,  fig.width = 7}
-plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
+plot_id_nlsLoop(data = Chlorella_TRC, param_data = fits, id = '1')
 ```
 
 Further to this, __plot_all_nlsLoop__ will produce a pdf with each plot on a new sheet.
@@ -102,7 +102,7 @@ plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_T
 
 Instead of using the plotting functions within the package, we can easily create plots using ggplot and the predictions dataframe. For example, we can plot all the curve fits split by growth temperature and acclimation _vs._ adaptation
 
-```{r data wrangling, fig.height=7,  fig.width = 7}
+```{r data_wrangling, fig.height=7,  fig.width = 7}
 # get distinct values of process, flux and growth.temp for each value of curve_id
 d_treatment <- Chlorella_TRC[,c('curve_id','process', 'growth.temp', 'flux')]
 d_treatment <- d_treatment[!duplicated(d_treatment),]
@@ -143,7 +143,34 @@ gather(fits$params, 'parameter', 'value', c(lnc, E, Eh, Th)) %>%
   theme(legend.position = 'top')
 ```
 
-When you are happy with your starting parameter values, __nlsLoop2__ can be used to speed up your model fitting.
+The confidence intervals of each fit can also be calculated using __confint_nlsLoop__.
+
+```{r, confint_nlsLoop, fig.width = 7, fig.height = 8}
+# calculate confidence intervals for each fit
+CIs <- confint_nlsLoop(Chlorella_TRC, fits)
+
+# bind with factors dataframe
+CIs <- merge(CIs, d_treatment, by = 'curve_id')
+
+# plot
+ggplot(CIs, aes(col = flux)) +
+  geom_point(aes(curve_id, mean)) +
+  facet_wrap(~ param, scale = 'free_x', ncol = 4) +
+  geom_linerange(aes(curve_id, ymin = CI_lwr, ymax = CI_upr)) +
+  coord_flip() +
+  scale_color_manual(values = c('green4', 'black')) +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme(legend.position = 'top') +
+  xlab('Parameter estimate') +
+  ylab('curve')
+
+
+
+```
+
+When you are happy with your starting parameter values, __nlsLoop2__ can be used to speed up your model fitting by using __nls2__ to generate multiple starting values.
+
+
 
 __nlsLoop__ provides a more reliable and reproducible way of getting individual non-linear fits over levels of a factor of a dataframe. I hope this vignette has provided a good overview of its benefits and usage.
 

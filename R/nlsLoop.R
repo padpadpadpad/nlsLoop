@@ -215,7 +215,7 @@ nlsLoop <-
   # warnings for res ####
   if(r2 == 'N') {res <- res[,-grep('quasi_r2', colnames(res))]}
   if(supp_errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
-  if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi_r2 for details.', call. = F)}
+  if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi_rsq_nls for details.', call. = F)}
 
   # delete fits that simply have not worked
   # change quasi_r2 and AIC special odd values to NA

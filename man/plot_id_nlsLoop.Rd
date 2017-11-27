@@ -4,10 +4,10 @@
 \alias{plot_id_nlsLoop}
 \title{Creates a graph of one of the levels of id_col with the data points and corresponding predictions}
 \usage{
-plot_id_nlsLoop(raw_data, param_data, id)
+plot_id_nlsLoop(data, param_data, id)
 }
 \arguments{
-\item{raw_data}{the data frame containing the data used in the nlsLoop argument.}
+\item{data}{the data frame containing the data used in the nlsLoop call.}
 
 \item{param_data}{the nlsLoop object.}
 
@@ -43,7 +43,7 @@ fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                 param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
                 lower = c(lnc=-10, E=0, Eh=0, Th=0))
 
-plot_id_nlsLoop(raw_data = Chlorella_TRC_test, param_data = fits, id = '1')
+plot_id_nlsLoop(data = Chlorella_TRC_test, param_data = fits, id = '1')
 
 }
 \author{

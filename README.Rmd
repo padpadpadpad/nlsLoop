@@ -30,7 +30,7 @@ The mainstay of this package is `nlsLoop::nlsLoop()`. If you have a dataset wher
 
 ### Tutorial
 
-A more in-depth tutorial and explanation of how to use `nlsLoop()` can be found as a [blog post](https://padpadpadpad.github.io/post/introducing-nlsloop/) or by calling `vignette('nlsLoop')` from within R.
+A more in-depth tutorial and explanation of how to use `nlsLoop()` can be found by calling `vignette('nlsLoop')` from within R.
 
 ### Installation and examples
 
@@ -38,7 +38,7 @@ A more in-depth tutorial and explanation of how to use `nlsLoop()` can be found 
 
 ```{r install, message=FALSE, eval = FALSE}
 # install package
-devtools::install_github("padpadpadpad/nlsLoop")
+devtools::install_github("padpadpadpad/nlsLoop", build_vignettes = TRUE)
 
 ```
 
@@ -46,8 +46,12 @@ devtools::install_github("padpadpadpad/nlsLoop")
 
 ```{r run_nlsLoop, message=FALSE, warning=FALSE, results='hide'}
 
-# load in nlsLoop
+# load in nlsLoop and other packages
 library(nlsLoop)
+library(ggplot2)
+
+# load nlsLoop vignette
+vignette('nlsLoop')
 
 # load in example data set
 data("Chlorella_TRC")
@@ -78,13 +82,15 @@ fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
 
 ```{r look_at_data}
 head(fits$params)
+
+head(fits$predictions)
 ```
 
 #### 4. Check fit of single curve
 
-```{r first_fit_plot, fig.height=6, fig.width=8}
+```{r first_fit_plot, fig.height=6, fig.width=7}
 # plot a single curve
-plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
+plot_id_nlsLoop(data = Chlorella_TRC, param_data = fits, id = '1')
 ```
 
 #### 5. Check fit of all curves (creates a pdf)
@@ -94,6 +100,51 @@ plot_id_nlsLoop(raw_data = Chlorella_TRC, param_data = fits, id = '1')
 plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_TRC, param_data = fits)
 ```
 
+#### 6. Plot predictions
+
+```{r data_wrangling, fig.height=7,  fig.width = 7}
+# get distinct values of process, flux and growth.temp for each value of curve_id
+d_treatment <- Chlorella_TRC[,c('curve_id','process', 'growth.temp', 'flux')]
+d_treatment <- d_treatment[!duplicated(d_treatment),]
+
+# merge with predictions by curve_id
+fits$predictions <- merge(fits$predictions, d_treatment, by = 'curve_id')
+
+# plot every curve
+ggplot() +
+  geom_point(aes(K, ln.rate, col = flux), size = 2, Chlorella_TRC) +
+  geom_line(aes(K, ln.rate, col = flux, group = curve_id), alpha = 0.5, fits$predictions) +
+  facet_wrap(~ growth.temp + process, labeller = labeller(.multi_line = F)) +
+  scale_colour_manual(values = c('green4', 'black')) +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  ylab('log Metabolic rate') +
+  xlab('Assay temperature (ºC)') +
+  theme(legend.position = c(0.9, 0.15))
+
+```
+
+
+#### 7. Get and plot confidence intervals of parameters
+
+```{r, confint_nlsLoop, fig.width = 7, fig.height = 8}
+# calculate confidence intervals for each fit
+CIs <- confint_nlsLoop(Chlorella_TRC, fits)
+
+# bind with factors dataframe
+CIs <- merge(CIs, d_treatment, by = 'curve_id')
+
+# plot
+ggplot(CIs, aes(col = flux)) +
+  geom_point(aes(curve_id, mean)) +
+  facet_wrap(~ param, scale = 'free_x', ncol = 4) +
+  geom_linerange(aes(curve_id, ymin = CI_lwr, ymax = CI_upr)) +
+  coord_flip() +
+  scale_color_manual(values = c('green4', 'black')) +
+  theme_bw(base_size = 12, base_family = 'Helvetica') +
+  theme(legend.position = 'top') +
+  xlab('Parameter estimate') +
+  ylab('curve')
 
 
 
+```
