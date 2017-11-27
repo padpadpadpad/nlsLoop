@@ -49,7 +49,7 @@ parameters (Burnham & Anderson 2002 recommend its use when n / n_param < 40).}
 returns a list of class \code{nlsLoop}. Notable elements within the list are \code{$params} and \code{$predictions} that give the best fit parameters and predictions based on these parameters for each individual fit.
 }
 \description{
-Fiinds the best estimated model to each of a set of curves using non-linear
+Finds the best estimated model to each of a set of curves using non-linear
 least squares regression using nlsLM(). Start parameters are found using nls2
 }
 \note{

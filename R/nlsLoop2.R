@@ -1,7 +1,7 @@
 #' Loops through a non-linear model on many different curves to find the best
 #' possible estimates
 #'
-#' Fiinds the best estimated model to each of a set of curves using non-linear
+#' Finds the best estimated model to each of a set of curves using non-linear
 #' least squares regression using nlsLM(). Start parameters are found using nls2
 #'
 #' @param data a data frame containing an column to differentiate between curves and the response and predictor variables.
@@ -223,13 +223,13 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp_errors = 
       preds[,1] <- as.character(preds[,1])
 
       ### setting up a list return object
-      val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]]), params_est = params_est), params = res, predictions = preds)
+      val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]]), params_est = params_est, stringsAsFactors = FALSE), params = res, predictions = preds)
     }
   }
   else{
 
     ### setting up a list return object
-    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]])), params = res)
+    val <- list(formula = formula, info = data.frame(id_col = id_col, params_ind = params_ind, param_dep = as.character(formula[[2]]), stringsAsFactors = FALSE), params = res)
   }
 
 
