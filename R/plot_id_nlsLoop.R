@@ -1,6 +1,6 @@
-# function
+# plotting predicted fit over points from an nlsLoop fit
 
-#' Creates a graph of one of the levels of id_col with the data points and corresponding predictions
+#' Creates a graph of one of the levels of id_col with the data points and corresponding predictions.
 #'
 #' @param data the data frame containing the data used in the nlsLoop call.
 #' @param param_data the nlsLoop object.
@@ -45,10 +45,10 @@ plot_id_nlsLoop <- function(data, param_data, id){
   predict_data <- predict_data[predict_data[,id_col] == id,]
   plot <- ggplot2::ggplot() +
     ggplot2::geom_line(ggplot2::aes_string(x = x, y = y), predict_data, col = 'red', linetype = 2) +
-    ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), shape = 21, fill = 'white', size = 2.75, raw_dat) +
+    ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), size = 2.75, raw_dat) +
     ggplot2::ylab(y) +
     ggplot2::xlab(x) +
-    ggplot2::theme_bw(base_family = 'Helvetica', base_size = 14) +
+    ggplot2::theme_bw(base_size = 14) +
     ggplot2::ggtitle(id)
   return(plot)
 

@@ -19,8 +19,7 @@ value of r squared for specific non-linear model object
 }
 \description{
 Calculates a quasi-rsquared value for non linear least squares regression
-models. The formula for calculating this is given in the paper in the
-references (Spiess 2010).
+models.
 }
 \details{
 cautionary notes of whether its useful are provided \href{http://stackoverflow.com/questions/14530770/calculating-r2-for-a-nonlinear-model}{here}. A personal highlight of which is 'If someone asks for rope to hang themselves, its fine to give it to them (while performing due diligence by asking "are you sure you want to do this?")'

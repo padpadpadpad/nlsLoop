@@ -28,6 +28,8 @@ The mainstay of this package is `nlsLoop::nlsLoop()`. If you have a dataset wher
 
 `nlsLoop()` allows for a range of starting values, looping through and attempting a fit for thousands of unique combination of starting values at each level of the factor, picking the best fit for each model using AIC scores.
 
+It also returns predictions for each level of the factor in tidy format, making it simple to plot and evaluate each fit using `ggplot2`.
+
 ### Tutorial
 
 A more in-depth tutorial and explanation of how to use `nlsLoop()` can be found by calling `vignette('nlsLoop')` from within R.
@@ -97,7 +99,7 @@ plot_id_nlsLoop(data = Chlorella_TRC, param_data = fits, id = '1')
 
 ```{r pdf_fits, eval=FALSE}
 # create pdf of each curve
-plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_TRC, param_data = fits)
+plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', data = Chlorella_TRC, param_data = fits)
 ```
 
 #### 6. Plot predictions

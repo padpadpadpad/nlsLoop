@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_all_nlsLoop.R
 \name{plot_all_nlsLoop}
 \alias{plot_all_nlsLoop}
-\title{plot_all_nlsLoop}
+\title{Plot all the predicted fits of an nlsLoop object}
 \usage{
 plot_all_nlsLoop(file_name, data, param_data, id_col = NULL,
   col_point = NULL, col_line = NULL, group = NULL, ...)
@@ -28,7 +28,7 @@ plot_all_nlsLoop(file_name, data, param_data, id_col = NULL,
 a plot using ggplot2 of the points and predictions of a single level of \code{id_col}
 }
 \description{
-creates a pdf of all curves fitted with nlsLoop
+creates a pdf of all models fitted with nlsLoop.
 }
 \details{
 Creates a pdf where each new page is a graph of one level of \code{id_col} with raw data and corresponding predictions.

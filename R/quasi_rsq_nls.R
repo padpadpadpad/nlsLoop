@@ -1,8 +1,7 @@
 #' R squared statistic for non linear models
 #'
 #' Calculates a quasi-rsquared value for non linear least squares regression
-#' models. The formula for calculating this is given in the paper in the
-#' references (Spiess 2010).
+#' models.
 #'
 #' @param mdl model object from which R^2 is desired. Used to calculate the
 #' residual sum of squares.

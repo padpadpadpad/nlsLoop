@@ -120,7 +120,11 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp_errors = 
   res$quasi_r2 <- 0
 
   # fit nls model using LM optimisation and using shotgun approach to get starting values ####
+  pb <- progress::progress_bar$new(total = length(id), clear  = FALSE)
+  pb$tick(0)
+
   for (i in 1:length(id)){
+    pb$tick()
     fit <- NULL
     fit.nls2 <- NULL
     data.fit <- data[data[,id_col] == id[i],]
@@ -171,7 +175,6 @@ function(model, data, id_col, tries, param_bds, r2 = c('Y', 'N'), supp_errors = 
   }
   # warnings for res ####
   if(r2 == 'N') {res <- res[,-grep('quasi_r2', colnames(res))]}
-  if(supp_errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
   if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi_rsq_nls for details.', call. = F)}
 
   # delete fits that simply have not worked

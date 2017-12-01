@@ -1,6 +1,6 @@
-#' plot_all_nlsLoop
+#' Plot all the predicted fits of an nlsLoop object
 #'
-#' creates a pdf of all curves fitted with nlsLoop
+#' creates a pdf of all models fitted with nlsLoop.
 #'
 #' Creates a pdf where each new page is a graph of one level of \code{id_col} with raw data and corresponding predictions.
 #' @param file_name the desired path for the pdf to be saved to.
@@ -61,13 +61,15 @@ plot_all_nlsLoop <- function(file_name, data, param_data, id_col = NULL, col_poi
 
   id <- unique(data[,id_col])
   grDevices::pdf(file_name, ...)
+  pb <- progress::progress_bar$new(total = length(id), clear  = FALSE)
   for(i in 1:length(id)){
+    pb$tick()
     temp_raw <- data[data[,id_col] == id[i],]
     temp_pred <-  predict_data[predict_data[,id_col] == id[i],]
     plot <- ggplot2::ggplot() +
       ggplot2::ylab(y) +
       ggplot2::xlab(x) +
-      ggplot2::theme_bw(base_family = 'Helvetica', base_size = 14) +
+      ggplot2::theme_bw(base_size = 14) +
       ggplot2::ggtitle(id[i])
     if(!is.null(col_line) & nrow(temp_pred) > 0){
       plot <- plot + ggplot2::geom_line(ggplot2::aes_string(x = x, y = y,
@@ -84,7 +86,7 @@ plot_all_nlsLoop <- function(file_name, data, param_data, id_col = NULL, col_poi
                          temp_pred, linetype = 2)
     }
     if(is.null(col_point) & nrow(temp_raw) > 0){
-      plot <- plot + ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), fill = 'white', size = 2,
+      plot <- plot + ggplot2::geom_point(ggplot2::aes_string(x = x, y = y), size = 2,
                                         temp_raw)
     }
 

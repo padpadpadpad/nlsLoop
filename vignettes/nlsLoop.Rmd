@@ -23,7 +23,7 @@ I will demonstrate how the unimodal resposne can be fitted with the Sharpe-Schoo
 
 $$log(rate) = lnc + E(\frac{1}{T_{c}} - \frac{1}{kT}) - ln(1 + e^{E_h(\frac{1}{kT_h} - \frac{1}{kT})})$$
 
-Where $k$ is Boltzmann's constant $8.62e^{-5}$ and $T$ is temperature in Kelvin. A detailed explanation of the other parameters model can be found here (Padfield _et. al_ 2016)[http://onlinelibrary.wiley.com/doi/10.1111/ele.12545/epdf]. 
+Where $k$ is Boltzmann's constant $8.62e^{-5}$ and $T$ is temperature in Kelvin. A detailed explanation of the other parameters model can be found [here](http://onlinelibrary.wiley.com/doi/10.1111/ele.12545/epdf)(Padfield _et. al_ 2016). 
 
 We begin with loading in the data, which comes with the package.
 
@@ -60,7 +60,7 @@ fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = Chlorella_TRC,
                      tries = 500,
                      id_col = 'curve_id',
-                     param_bds = c(-10, 10, 0.1, 2, 0.5, 5, 285, 330),
+                     param_bds = c(-10, 10, 0.1, 2, 0.5, 10, 285, 330),
                      r2 = 'Y',
                      supp_errors = 'Y',
                      AICc = 'Y',
@@ -70,7 +70,7 @@ fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
 
 The documentation for __nlsLoop__ can be found by using `?nlsLoop`. The argument `param_bds` sets upper and lower limits for each parameter from which random values between these are picked. The list of values goes through the lower and upper boundary for each parameter in turn (i.e. $lnc_{lower}$, $lnc_{lower}$, $E_{lower}$, $E_{upper}$ ...). A data frame is then created with `nrow = tries` of random draws of combinations from all of the parameter values. The model then loops through a call to __nlsLM__ for each of these sets of starting parameters. Each time the AIC score is lower for an individual fit (indicating a better relative fit), the parameter dataframe is updated.
 
-When running, the code gives messages of progress of how far through the number of curve fits the code is, and prints the number of curve fits (every ten) that a single curve fit is through.  If the AIC score does not get lower for 100 different fits to the data (using different parameter values) __nlsLoop__ moves onto the next curve fit.
+When running through the iterations for each level of the factor, if the AIC score does not get lower, indicating a better relative fit, for 100 different calls of __nlsLM__ using different parameter values, __nlsLoop__ moves onto the next level of the factor.
 
 __nlsLoop__ returns an `nlsLoop` object that works the same way as a list. It is made up of:
     - __formula__ the formula used in the fit
@@ -97,7 +97,7 @@ plot_id_nlsLoop(data = Chlorella_TRC, param_data = fits, id = '1')
 Further to this, __plot_all_nlsLoop__ will produce a pdf with each plot on a new sheet.
 
 ```{r pdf_fits, eval=FALSE}
-plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', raw_data = Chlorella_TRC, param_data = fits)
+plot_all_nlsLoop('path/of/where/you/want/to/save/me.pdf', data = Chlorella_TRC, param_data = fits)
 ```
 
 Instead of using the plotting functions within the package, we can easily create plots using ggplot and the predictions dataframe. For example, we can plot all the curve fits split by growth temperature and acclimation _vs._ adaptation
@@ -175,6 +175,7 @@ When you are happy with your starting parameter values, __nlsLoop2__ can be used
 __nlsLoop__ provides a more reliable and reproducible way of getting individual non-linear fits over levels of a factor of a dataframe. I hope this vignette has provided a good overview of its benefits and usage.
 
 ### References:
-    - Low-Décarie, E., Boatman, T.G., Bennett, N., Passfield, W., Gavalás-Olea, A., Siegel, P. & Geider, R.J. (2017) Predictions of response to temperature are contingent on model choice and data quality. Ecology & Evolution.
-    - Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19(2), 133-142.
-    - Schoolfield, R.M., Sharpe, P.J. & Magnuson, C.E. (1981). Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theoretical Biology, 88, 719–31.
+
+- Low-Décarie, E., Boatman, T.G., Bennett, N., Passfield, W., Gavalás-Olea, A., Siegel, P. & Geider, R.J. (2017) Predictions of response to temperature are contingent on model choice and data quality. Ecology & Evolution.
+- Padfield, D., Yvon-durocher, G., Buckling, A., Jennings, S. & Yvon-durocher, G. (2015). Rapid evolution of metabolic traits explains thermal adaptation in phytoplankton. Ecology Letters, 19(2), 133-142.
+- Schoolfield, R.M., Sharpe, P.J. & Magnuson, C.E. (1981). Non-linear regression of biological temperature-dependent rate models based on absolute reaction-rate theory. J. Theoretical Biology, 88, 719–31.

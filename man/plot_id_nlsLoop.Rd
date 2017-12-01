@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_id_nlsLoop.R
 \name{plot_id_nlsLoop}
 \alias{plot_id_nlsLoop}
-\title{Creates a graph of one of the levels of id_col with the data points and corresponding predictions}
+\title{Creates a graph of one of the levels of id_col with the data points and corresponding predictions.}
 \usage{
 plot_id_nlsLoop(data, param_data, id)
 }
@@ -17,7 +17,7 @@ plot_id_nlsLoop(data, param_data, id)
 a plot using ggplot2 of the points and predictions of a single level of \code{id_col}
 }
 \description{
-Creates a graph of one of the levels of id_col with the data points and corresponding predictions
+Creates a graph of one of the levels of id_col with the data points and corresponding predictions.
 }
 \examples{
 # load in data

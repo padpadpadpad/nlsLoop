@@ -15,7 +15,7 @@ confint_nlsLoop(data, param_data)
 returns a dataframe in stacked format with columns \code{id_col}, \code{param}, \code{CI_lwr}, \code{CI_higher}, \code{mean} that give the confidence intervals and mean estimate of each model fit.
 }
 \description{
-Determines the confidence intervals of a set of non-linear regressions fitted with nlsLoop
+Determines the confidence intervals of a set of non-linear regressions fitted with nlsLoop.
 }
 \details{
 calculates the confidence intervals of each fit using \code{\link[nlstools]{confint2}} and the "asymptotic" approach. This method cannot be changed to "profile" as it the model is fitted with \code{\link[minpack.lm]{nlsLM}}

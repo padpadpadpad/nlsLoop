@@ -141,8 +141,13 @@ nlsLoop <-
   res$quasi_r2 <- 0
 
   # fit nls model using LM optimisation and using shotgun approach to get starting values ####
+
+  # set up progress bar
+  pb <- progress::progress_bar$new(total = length(id), clear = FALSE)
+  pb$tick(0)
   for (i in 1:length(id)){
-    cat('\n', i, 'of', length(id), ':', id[i], '\n')
+    # cat('\n', i, 'of', length(id), ':', id[i], '\n')
+    pb$tick()
     fit <- NULL
     # subset the dataframe to fit the model for each unique curve by id
     data.fit <- data[data[,id_col] == id[i],]
@@ -151,7 +156,7 @@ nlsLoop <-
     count <- 0
 
     for (j in 1:tries){
-      if((j/10) %% 1 == 0){cat(j, ' ')}
+      #if((j/10) %% 1 == 0){cat(j, ' ')}
       # create start list
       start.vals <- list()
       for(k in 1:length(params_est)){
@@ -214,7 +219,6 @@ nlsLoop <-
 }
   # warnings for res ####
   if(r2 == 'N') {res <- res[,-grep('quasi_r2', colnames(res))]}
-  if(supp_errors == 'Y'){warning('Errors have been suppressed from nlsLM()', call. = F)}
   if(r2 == 'Y'){warning('R squared values for non-linear models should be used with caution. See references in ?quasi_rsq_nls for details.', call. = F)}
 
   # delete fits that simply have not worked

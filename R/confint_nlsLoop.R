@@ -1,6 +1,6 @@
 #' Calculate the confidence intervals from an nlsLoop object
 #'
-#' Determines the confidence intervals of a set of non-linear regressions fitted with nlsLoop
+#' Determines the confidence intervals of a set of non-linear regressions fitted with nlsLoop.
 #'
 #' @param data the data frame containing the data used in the nlsLoop argument
 #' @param param_data the nlsLoop object
