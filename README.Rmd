@@ -46,7 +46,7 @@ devtools::install_github("padpadpadpad/nlsLoop", build_vignettes = TRUE)
 
 #### 2. Run nlsLoop()
 
-```{r run_nlsLoop, message=FALSE, warning=FALSE, results='hide'}
+```{r run_nlsLoop_prep, message=FALSE, warning=FALSE, results='hide'}
 
 # load in nlsLoop and other packages
 library(nlsLoop)
@@ -66,7 +66,9 @@ schoolfield_high <- function(lnc, E, Eh, Th, temp, Tc) {
   inactivation.term <- log(1/(1 + exp(Eh/k*(1/Th - 1/temp))))
   return(boltzmann.term + inactivation.term)
   }
+```
 
+```{r run_nlsloop}
 # run nlsLoop
 fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = Chlorella_TRC,

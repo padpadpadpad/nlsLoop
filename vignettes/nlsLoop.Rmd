@@ -55,7 +55,7 @@ We can then run __nlsLoop__, as long as we have a column in the dataframe that i
 
 When first running __nlsLoop__, it is advisable to run a single __nls__ fit on the whole dataset to give your start parameters some ball park boundaries. If you do not then you may suffer the same problems with __nlsLoop__ as are experienced with __nlsList__.
 
-```{r nlsLoop, message=FALSE, warning=FALSE, results='hide'}
+```{r nlsLoop}
 fits <- nlsLoop(ln.rate ~ schoolfield_high(lnc, E, Eh, Th, temp = K, Tc = 20),
                      data = Chlorella_TRC,
                      tries = 500,
