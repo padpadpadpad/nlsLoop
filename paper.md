@@ -16,8 +16,8 @@ bibliography: paper.bib
 
 # Summary
 
-__nlsLoop__ is a simple R package that gives a more reproducible and reliable method for fitting individual non-linear regression fits over levels of a factor. This procedure is commonly done using __nlme::nlsList__, but this function only uses one set of parameter values. Consequently, some curves fail to converge on the correct parameter values simply because of the starting values being too far away from the starting values. __nlsLoop__ improves on __nlme::nlsList__ by allowing multiple starting values for each parameter, thereby exploring more parameter space when model fitting. The best model is chosen based on AIC score, ensuring that results are more reproducible and replicable.
-- This method and the R package __nlsLoop__ have been used in multiple publications in the last two years (Padfield _et al._ 2016, Padfield _et al._ 2017).
+- __nlsLoop__ is a simple R package that gives a more reproducible and reliable method for fitting individual non-linear regression fits over levels of a factor. This procedure is commonly done using __nlme::nlsList__, but this function only uses one set of parameter values. Consequently, some curves fail to converge on the correct parameter values simply because of the starting values being too far away from the starting values. __nlsLoop__ improves on __nlme::nlsList__ by allowing multiple starting values for each parameter, thereby exploring more parameter space when model fitting. The best model is chosen based on AIC score, ensuring that results are more reproducible and replicable.
+- This method and the R package __nlsLoop__ have been used in multiple publications in the last two years (Padfield _et al._ 2016, Padfield _et al._ 2017). It is also used in other projects within the lab group and is likely to be useful to the wider scientific community.
 
 # References
 

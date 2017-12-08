@@ -7,9 +7,13 @@ Tools for expanding the non-linear regression method nls and nlsList from nlme.
 
 ### Issues and suggestions
 
-Please report any issues/suggestions in the [issues link](https://github.com/padpadpadpad/nlsLoop/issues) for the repository.
+Please report any issues/suggestions for improvement in the [issues link](https://github.com/padpadpadpad/nlsLoop/issues) for the repository. Or please email <d.padfield@exeter.ac.uk>.
 
 Travis: [![Build Status](https://travis-ci.org/padpadpadpad/nlsLoop.svg?branch=master)](https://travis-ci.org/padpadpadpad/nlsLoop)
+
+### Licensing
+
+This package is licensed under GPL-3.
 
 ### Overview
 
@@ -81,7 +85,7 @@ head(fits$params)
 #> 2        2 -1.349431 1.0653450 4.211374 312.6591 22.39398 0.8978426
 #> 3        3 -1.815315 1.1155333 4.140395 310.9545 34.77114 0.7804032
 #> 4        4 -1.612615 1.0982576 3.025816 310.6412 31.04688 0.8709134
-#> 5        5 -1.767711 1.1244277 9.010641 317.0688 41.69970 0.7602547
+#> 5        5 -1.767711 1.1244277 9.010640 317.0688 41.69970 0.7602547
 #> 6        6 -1.717258 1.1727047 4.077252 311.4596 37.03555 0.7289198
 
 head(fits$predictions)
